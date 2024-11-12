@@ -10,7 +10,9 @@ todo:
 
 1、2 & 3
 
-看论文 & 调研greuler库
+* -> 配置javascript & g++环境，撰写makefile
+
+* -> 看论文 & 调研greuler库
 
 greuler
 
