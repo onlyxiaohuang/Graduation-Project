@@ -6,6 +6,7 @@
 #include <map>
 #include <set>
 #include <iterator>
+#include <iostream>
 
 
 extern std::mt19937& random_begin(unsigned int seed);
@@ -16,9 +17,9 @@ const int dim = 10;
 static int seed = 233;
 
 struct Node{
-    Node(){
-        vec.resize(dim);
-    }
+    Node() = default;
+        //vec.resize(dim);
+    
     Node(std::vector <__type> &tmp){
         std::swap(tmp,vec);
     }
@@ -33,7 +34,7 @@ struct Graph{
 };
 static Graph G;
 
-__type dis(std::vector<__type> &x,std::vector<__type> &y){
+__type dis(const std::vector<__type> &x,const std::vector<__type> &y){
     __type ret = 0;
     assert(x.size() == y.size());
     for(int i = 0;i < x.size();i ++){
@@ -63,25 +64,73 @@ void build_graph(){//build the graph with original nodes
     }
 }
 
-void Greedy_Graph_Search(Node q,Node p,int efs){ //FINGER ALGORITHM-1
-    auto cmp = [&q](Node &a,Node &b) -> bool{
-        return dis(a.vec,q.vec) < dis(b.vec,q.vec);
+std::vector<Node> Greedy_Graph_Search(Node q,Node p,int efs){ //FINGER ALGORITHM-1
+    auto cmp = [&q](const Node *a,const Node *b) -> bool{
+        return dis(a->vec,q.vec) < dis(b->vec,q.vec);
     };
-    std::set<Node,std::vector<Node>, decltype(cmp)> T(cmp);
+    std::set<const Node*, decltype(cmp)> T(cmp);
     std::set<Node*> V;
 
-    T.insert(p);
+    T.insert(&p);
     while(!T.empty()){
         auto cur = *T.begin();
         auto last = *T.rbegin();
-        __type dist = dis(last.vec,q.vec);
-
+        __type dist = dis(last->vec,q.vec);
+        if(dis(cur->vec,q.vec) > dist){
+            std::vector <Node> tmp;
+            for(auto tt:T){
+                tmp.push_back(*tt);
+            }
+            return tmp;
+        }
         
+        for(auto n:cur->tonode){
+            if(V.find(n) != V.end()){
+                continue;
+            }
 
+            V.insert(n);
+
+            if(dis(n->vec,q.vec) < dist || T.size() < efs){
+                T.insert(n);
+                if(T.size() > efs){
+                    T.erase(prev(T.end()));
+                }
+            }
+
+            dist = dis(last->vec,q.vec);
+        }
     }
 
+    std::vector <Node> tmp;
+    for(auto tt:T){
+        tmp.push_back(*tt);
+    }
+    return tmp;
 }
 
 int main(){
+    initialize(10,-100,100);
+    build_graph();
 
+    std::cout << "The Graph vectors are:" << std::endl;
+    for(auto tt:G.Nodes){
+        for(auto y:tt.vec){
+            std::cout << y << " ";
+        }
+        std::cout << std::endl;
+    }
+    
+    auto T = Greedy_Graph_Search(G.Nodes[0],G.Nodes[1],5);
+    
+    std::cout << "The results are:" << std::endl;
+    
+    for(auto tt:T){
+        for(auto y:tt.vec){
+            std::cout << y << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    return 0;
 }
