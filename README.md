@@ -18,3 +18,9 @@ todo:
 
 greuler
 
+On the way:
+HNSW-FINGER
+
+Done:
+
+DiskANN
