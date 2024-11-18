@@ -10,8 +10,6 @@ void test_rand(){
     int N = 20,M = 30;
 
     const int L = -100 ,R = 100;
-    
-    
 
     auto rd = random_begin(233);
     //std::cout << "OK" << std::endl;

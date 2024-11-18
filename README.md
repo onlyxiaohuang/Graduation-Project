@@ -12,7 +12,7 @@ todo:
 
 * -> 配置javascript & g++环境
 
-* -> 看论文，撰写makefile
+* -> 看论文,实现算法
 
 * -> 调研greuler库
 
