@@ -10,3 +10,17 @@ int random_int(std::mt19937 &rd,int l,int r){
     int now = rd() % len + l;
     return now;
 }
+
+Graph initialize(int N,int L,int R,int seed,int dim){//N nodes with vector in range[L,R]
+    auto rd = random_begin(seed);
+    
+    Graph G;
+    for(int i = 1;i <= N;i ++){
+        Node node;
+        for (int j = 1; j <= dim;j ++){
+            node.vec.push_back(random_int(rd,L,R));
+        }
+        G.Nodes.push_back(node);
+    }
+    return G;
+}
