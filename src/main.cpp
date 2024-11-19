@@ -50,9 +50,14 @@ std::vector<Node> Greedy_Graph_Search(Node q,Node p,int efs){ //FINGER ALGORITHM
     T.insert(&p);
     while(!T.empty()){
         auto cur = *T.begin();
+        if(debug == 1){
+            std::cout << &cur << std::endl;
+            std::cout << T.size() << std::endl;
+        }
         auto last = *T.rbegin();
         __type dist = dis(last->vec,q.vec);
-        if(dis(cur->vec,q.vec) > dist){
+        
+        if(dis(cur->vec,q.vec) >= dist){
             std::vector <Node> tmp;
             for(auto tt:T){
                 tmp.push_back(*tt);
@@ -86,17 +91,20 @@ std::vector<Node> Greedy_Graph_Search(Node q,Node p,int efs){ //FINGER ALGORITHM
 }
 
 int main(){
-    initialize(N,L,R,seed,dim);
+    G = initialize(N,L,R,seed,dim);
     build_graph_simple();
 
-    std::cout << "The Graph vectors are:" << std::endl;
-    for(auto tt:G.Nodes){
-        for(auto y:tt.vec){
-            std::cout << y << " ";
-        }
-        std::cout << std::endl;
-    }
-    
+    if(debug == 1){/*
+        std::cout << "The Graph vectors are:" << std::endl;
+        for(auto tt:G.Nodes){
+            std::cout << "Yes" << std::endl;
+            for(auto y:tt.vec){
+                std::cout << y << " ";
+            }
+            std::cout << std::endl;
+        }*/
+    }    
+
     auto T = Greedy_Graph_Search(G.Nodes[0],G.Nodes[1],5);
     
     std::cout << "The results are:" << std::endl;

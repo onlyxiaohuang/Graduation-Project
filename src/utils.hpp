@@ -5,7 +5,7 @@
 #include <random>
 
 //debug
-const int debug = 1;
+const int debug = 0;
 
 //characters
 const int dim = 10;
