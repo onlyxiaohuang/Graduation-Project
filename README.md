@@ -16,11 +16,16 @@ todo:
 
 * -> 调研greuler库
 
-greuler
-
 On the way:
 HNSW-FINGER
 
 Done:
 
 DiskANN
+
+
+hnswlib库：
+https://github.com/nmslib/hnswlib/tree/master
+
+greuler库:
+https://github.com/mauriciopoppe/greuler

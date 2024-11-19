@@ -9,6 +9,7 @@
 #include <iostream>
 
 
+
 extern std::mt19937& random_begin(unsigned int seed);
 extern int random_int(std::mt19937 &rd,int l,int r);
 
@@ -55,13 +56,17 @@ void initialize(int N,int L,int R){//N nodes with vector in range[L,R]
     }
 }
 
-void build_graph(){//build the graph with original nodes
+void build_graph_simple(){//build the graph with original nodes,
     for(int i = 0;i < G.Nodes.size();i ++){
         for(int j = 1;j < G.Nodes.size();j ++){
             G.Nodes[i].tonode.push_back(&G.Nodes[j]);
             G.Nodes[j].tonode.push_back(&G.Nodes[i]);
         }
     }
+}
+
+void build_graph_HNSW(){//build graph by HNSW
+    
 }
 
 std::vector<Node> Greedy_Graph_Search(Node q,Node p,int efs){ //FINGER ALGORITHM-1

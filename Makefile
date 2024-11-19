@@ -14,29 +14,29 @@ LDLIBS = -luv -luv_a
 utils:
 	$(G++) $(CFLAGS) -c ./src/utils.cpp -o ./output/utils.o
 
+#MAKE HNSW
+hnsw:
+	$(G++) $(CFLAGS) -c ./src/hnsw.cpp -o ./output/hnsw.o
+
 #MAKE MAIN
-main: main.o
-	$(G++) ./output/main.o ./output/utils.o -o ./output/main
-#	$(shell chmod +x ./output/server)
-#	$(shell ./output/server)
-	
-main.o: ./src/main.cpp utils
+main: main.o 
+	$(G++) ./output/main.o ./output/utils.o ./output/hnsw.o -o ./output/main
+
+main.o: ./src/main.cpp utils hnsw
 	$(G++) $(CFLAGS) -c ./src/main.cpp -o ./output/main.o
 
 #MAKE TEST
-test: test.o
-	$(G++) ./output/utils.o ./output/test.o -o ./output/test
-#	$(shell chmod +x ./output/client)
-#	$(shell ./output/client)
+test: test.o 
+	$(G++) ./output/test.o ./output/utils.o ./output/hnsw.o -o ./output/test
 
-test.o: ./src/test.cpp utils
+test.o: ./src/test.cpp utils hnsw
 	$(G++) $(CFLAGS) -c ./src/test.cpp -o ./output/test.o	
+
 
 #ALL
 all: utils main test
 
 #CLEAN
-
 clean:
 	rm -rf ./output/test.o
 	rm -rf ./output/utils.o

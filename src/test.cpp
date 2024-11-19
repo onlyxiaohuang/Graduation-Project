@@ -1,6 +1,9 @@
 #include "utils.hpp"
+#include "hnsw.hpp"
 
 #include <iostream>
+
+//TESTING FOR MAKING RAND
 
 extern std::mt19937& random_begin(unsigned int seed);
 
@@ -21,6 +24,12 @@ void test_rand(){
         }
         std::cout << std::endl;
     }
+}
+
+//TESTING FOR HNSW.cpp
+
+void test_build_graph(){
+
 }
 
 int main(){
