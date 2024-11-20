@@ -17,6 +17,7 @@ Graph initialize(int N,int L,int R,int seed,int dim){//N nodes with vector in ra
     Graph G;
     for(int i = 1;i <= N;i ++){
         Node node;
+        node.index = i ;
         for (int j = 1; j <= dim;j ++){
             node.vec.push_back(random_int(rd,L,R));
         }

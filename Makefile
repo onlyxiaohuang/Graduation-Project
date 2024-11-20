@@ -6,6 +6,7 @@ G++ = /usr/bin/g++
 CFLAGS = -O2 -Wall -std=c++17
 LDFLAGS = -L./src/libs/libuv/src/unix/ -L./src/libs/libuv/src/win/src/core/ -L./src/libs/libuv/src/win/src -L./src/libs/libuv/src/ -L./src/libs/libuv/src/unix/ -L./src/libs/libuv/src/win/ -L./src/libs/libuv/src/unix/src/ -L./src
 LDLIBS = -luv -luv_a
+CDEBUG = -g -DDEBUG
 
 
 .PHONY: all clean utils main test
@@ -25,12 +26,18 @@ main: main.o
 main.o: ./src/main.cpp utils hnsw
 	$(G++) $(CFLAGS) -c ./src/main.cpp -o ./output/main.o
 
+debugmain: debugmain.o
+	$(G++) ./output/main.o ./output/utils.o ./output/hnsw.o -o ./output/main
+
+debugmain.o: ./src/main.cpp utils hnsw
+	$(G++) $(CFLAGS) -c $(CDEBUG) ./src/main.cpp -o ./output/main.o
+
 #MAKE TEST
 test: test.o 
 	$(G++) ./output/test.o ./output/utils.o ./output/hnsw.o -o ./output/test
 
 test.o: ./src/test.cpp utils hnsw
-	$(G++) $(CFLAGS) -c ./src/test.cpp -o ./output/test.o	
+	$(G++) $(CFLAGS) -c $(CDEBUG) ./src/test.cpp -o ./output/test.o	
 
 
 #ALL

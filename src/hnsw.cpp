@@ -58,6 +58,29 @@ hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G){//build graph by HN
     return alg_hnsw;
 }
 
+void Get_Graph(Graph &G,hnswlib::HierarchicalNSW<__type>* alg){
+
+    for(int i = 0;i < alg -> cur_element_count;i ++){//枚举每一个点的邻居
+        //std::cout << "Considering the Node " << i <<"'s neighbors:" << std::endl;
+        for(int level = 0 ;level <= alg -> element_levels_[i];level ++){//枚举的是level
+            //std::cout << "Now level = "  << level << "," << std::endl;
+            
+            hnswlib::linklistsizeint *ll_cur = alg -> get_linklist_at_level(i, level);
+            int size = alg -> getListCount(ll_cur);
+            hnswlib::tableint *data = (hnswlib::tableint *) (ll_cur + 1);
+            
+            std::vector <Node *> tonode;
+
+            for(int j = 0;j < size;j ++){
+                //std::cout << "The " << j << "th neighbor is " << data[j] << std::endl;
+                tonode.push_back(&G.Nodes[data[j]]);
+            }
+            G.Nodes[i].tonode.swap(tonode);
+        }
+    }
+
+}
+
 void delete_HNSW(hnswlib::HierarchicalNSW<__type>* alg_hnsw){
     delete alg_hnsw;
 }
