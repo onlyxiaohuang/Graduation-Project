@@ -12,7 +12,7 @@
 extern std::mt19937& random_begin(unsigned int seed);
 extern int random_int(std::mt19937 &rd,int l,int r);
 extern Graph initialize(int N,int L,int R,int seed,int dim);
-
+extern void Get_Graph(Graph &G,hnswlib::HierarchicalNSW<__type>* alg);
 
 static int seed = 233;
 
@@ -112,6 +112,7 @@ int main(){
             std::cout << std::endl;
         }*/
     }    
+    Get_Graph(G,alg);
 
     auto T = Greedy_Graph_Search(G.Nodes[0],G.Nodes[1],5);
     
