@@ -31,7 +31,7 @@ __type dis(const std::vector<__type> &x,const std::vector<__type> &y){
 
 void build_graph_simple(){//build the graph with original nodes,
     for(int i = 0;i < G.Nodes.size();i ++){
-        for(int j = i + 1;j < G.Nodes.size();j ++){
+        for(int j = i + 1;j < G.Nodes.size();j ++){ 
             G.Nodes[i].tonode.push_back(&G.Nodes[j]);
             G.Nodes[j].tonode.push_back(&G.Nodes[i]);
         }

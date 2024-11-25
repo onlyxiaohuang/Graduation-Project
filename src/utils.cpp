@@ -25,3 +25,43 @@ Graph initialize(int N,int L,int R,int seed,int dim){//N nodes with vector in ra
     }
     return G;
 }
+
+//read fvecs data
+void load_data(char* filename,float*& data, unsigned& num,unsigned& dim){
+    std::ifstream in(filename,std::ios::binary);
+    
+    if(!in.is_open()){
+        std::cout << "open file error" << std::endl;
+        exit( -1 );
+    }
+
+    in.read((char*)&dim,sizeof(unsigned));
+    in.seekg(0,std::ios::end);
+
+    std::ios::pos_type ss = in.tellg();
+    size_t fsize = (size_t)ss;
+    num = (unsigned)(fsize / (dim + 1) / 4);
+    data = new float[num * dim];
+
+    in.seekg(0,std::ios::beg);
+    for(size_t i = 0;i < num ;i ++){
+        in.seekg(4,std::ios::cur);
+        in.read((char*)data + i * dim * 4,dim * 4);
+    }
+    for(size_t i = 0;i < num;i ++){
+        std::cout << (float)data[i];
+        if(!i){
+            std::cout << " ";
+            continue;
+        }
+        if(i % (dim - 1) != 0){
+            std::cout << " ";
+        }
+        else{
+            std::cout << std::endl;
+        }
+    }
+
+    in.close();
+    
+}
