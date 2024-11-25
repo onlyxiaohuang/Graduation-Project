@@ -13,4 +13,4 @@ if [ ! -f "./test/gist.tar.gz" ]; then
 fi
 
 
-tar -zxvf ./test/gist.tar.gz
+tar -zxvf ./test/gist.tar.gz -C ./test
