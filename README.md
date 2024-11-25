@@ -17,7 +17,7 @@ todo:
 * -> 调研greuler库
 
 On the way:
-HNSW-FINGER
+FINGER优化路由算法 two-stage-routing
 
 Done:
 
@@ -29,3 +29,6 @@ https://github.com/nmslib/hnswlib/tree/master
 
 greuler库:
 https://github.com/mauriciopoppe/greuler
+
+数据集：
+http://corpus-texmex.irisa.fr/
