@@ -21,7 +21,7 @@ Graph initialize(int N,int L,int R,int seed,int dim){//N nodes with vector in ra
         for (int j = 1; j <= dim;j ++){
             node.vec.push_back(random_int(rd,L,R));
         }
-        G.Nodes.push_back(node);
+        G.Nodes.push_back(&node);
     }
     return G;
 }
@@ -64,4 +64,13 @@ void load_data(char* filename,float*& data, unsigned& num,unsigned& dim){
 
     in.close();
     
+}
+
+__type dis(const std::vector<__type> &x,const std::vector<__type> &y){
+    __type ret = 0;
+    assert(x.size() == y.size());
+    for(int i = 0;i < x.size();i ++){
+        ret += x[i] * y[i];
+    }
+    return ret;
 }

@@ -14,7 +14,7 @@ hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G){//build graph by HN
 
     //Add data to index
     for(int i = 0;i < N;i ++){
-        alg_hnsw -> addPoint((void*)&G.Nodes[i].vec[0],i);
+        alg_hnsw -> addPoint((void*)&G.Nodes[i]->vec[0],i);
     }        
 
     if(debug == 1){
@@ -25,7 +25,7 @@ hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G){//build graph by HN
     // Query the elements for themselves and measure recall
     float correct = 0;
     for (int i = 0; i < N; i++) {
-        std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg_hnsw->searchKnn((void*)&G.Nodes[i].vec[0], 1);
+        std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg_hnsw->searchKnn((void*)&G.Nodes[i]->vec[0], 1);
         hnswlib::labeltype label = result.top().second;
         if (label == i) correct++;
     }
@@ -48,7 +48,7 @@ hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G){//build graph by HN
     }
     correct = 0;
     for (int i = 0; i < N; i++) {
-        std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg_hnsw->searchKnn((void*)&G.Nodes[i].vec[0], 1);
+        std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg_hnsw->searchKnn((void*)&G.Nodes[i]->vec[0], 1);
         hnswlib::labeltype label = result.top().second;
         if (label == i) correct++;
     }
@@ -73,9 +73,9 @@ void Get_Graph(Graph &G,hnswlib::HierarchicalNSW<__type>* alg){
 
             for(int j = 0;j < size;j ++){
                 //std::cout << "The " << j << "th neighbor is " << data[j] << std::endl;
-                tonode.push_back(&G.Nodes[data[j]]);
+                tonode.push_back(G.Nodes[data[j]]);
             }
-            G.Nodes[i].tonode.swap(tonode);
+            G.Nodes[i]->tonode.swap(tonode);
         }
     }
 

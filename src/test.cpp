@@ -105,8 +105,8 @@ void test_Get_Graph(){
 
     for(int i = 0; i < G.Nodes.size(); i ++){
 
-        for(int j = 0; j < G.Nodes[i].tonode.size(); j ++){
-            std::cout << "Node " << i << " to " << G.Nodes[j].index << std::endl;
+        for(int j = 0; j < G.Nodes[i]->tonode.size(); j ++){
+            std::cout << "Node " << i << " to " << G.Nodes[j]->index << std::endl;
         }
     }
     

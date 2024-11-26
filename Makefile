@@ -9,7 +9,7 @@ LDLIBS = -luv -luv_a
 CDEBUG = -g -DDEBUG
 
 
-.PHONY: all clean utils main test
+.PHONY: all clean utils main test togg
 
 #MAKE UTILS
 utils:
@@ -19,22 +19,26 @@ utils:
 hnsw:
 	$(G++) $(CFLAGS) -c ./src/hnsw.cpp -o ./output/hnsw.o
 
+#MAKE TOGG
+togg:
+	$(G++) $(CFLAGS) -c ./src/togg.cpp -o ./output/togg.o
+
 #MAKE MAIN
 main: main.o 
-	$(G++) ./output/main.o ./output/utils.o ./output/hnsw.o -o ./output/main
+	$(G++) ./output/main.o ./output/utils.o ./output/hnsw.o ./output/togg.o -o ./output/main
 
 main.o: ./src/main.cpp utils hnsw
 	$(G++) $(CFLAGS) -c ./src/main.cpp -o ./output/main.o
 
 debugmain: debugmain.o
-	$(G++) ./output/main.o ./output/utils.o ./output/hnsw.o -o ./output/main
+	$(G++) ./output/main.o ./output/utils.o ./output/hnsw.o ./output/togg.o -o ./output/main
 
 debugmain.o: ./src/main.cpp utils hnsw
 	$(G++) $(CFLAGS) -c $(CDEBUG) ./src/main.cpp -o ./output/main.o
 
 #MAKE TEST
 test: test.o 
-	$(G++) ./output/test.o ./output/utils.o ./output/hnsw.o -o ./output/test
+	$(G++) ./output/test.o ./output/utils.o ./output/hnsw.o ./output/togg.o -o ./output/test
 
 test.o: ./src/test.cpp utils hnsw
 	$(G++) $(CFLAGS) -c $(CDEBUG) ./src/test.cpp -o ./output/test.o	
@@ -50,3 +54,4 @@ clean:
 	rm -rf ./output/test
 	rm -rf ./output/main.o
 	rm -rf ./output/main
+	rm -rf ./output/togg.o
