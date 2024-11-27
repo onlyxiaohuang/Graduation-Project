@@ -80,7 +80,7 @@ std::vector<Node *> OGS_KDT_Routing(Graph &G,Node *p,Node *q,int l){
             continue;
         }
         Visited.insert(tt);
-        std::cout << tt->index << std::endl;
+//        std::cout << tt->index << std::endl;
 //        if()
 
         int ddim = get_div_dim(G,(Node *)tt,r_proportion);
@@ -126,5 +126,6 @@ std::vector<Node *> OGS_KDT_Routing(Graph &G,Node *p,Node *q,int l){
     for(auto tt:C){
         ret.push_back((Node *)tt);
     }
+//    std::cout << "finished" << std::endl;
     return ret;
 }

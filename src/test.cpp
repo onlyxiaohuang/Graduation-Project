@@ -117,7 +117,7 @@ void test_Get_Graph(){
     delete_HNSW(alg);
 }
 
-//TEST TOGG Algorithm 1 & 2
+//TEST TOGG Algorithm 1 & 2, OGS-KDT
 extern std::vector<Node *> OGS_KDT_Routing(Graph &G,Node *p,Node *q,int L);
 void test_OGS_KDT_Routing(){
     std::cout << "Starting testing the OGS_KDT_Routing function" << std::endl;
@@ -133,13 +133,37 @@ void test_OGS_KDT_Routing(){
     int l = 10;
     auto RetAns = OGS_KDT_Routing(G,p.get(),q.get(),l);
     
-    std::cout << "The result is:" << std::endl;
-    for(auto tt:RetAns){
-        std::cout << tt << " ";
+//    std::cout << "The result is:" << std::endl;
+//    for(auto tt:RetAns){
+//        std::cout << tt << " ";
+//    }
+
+    int correct = 0,K = 10;//recall@K
+    for(int i = 0;i < N;i ++){
+        std::cout << "*" << i << std::endl;
+        auto result = alg -> searchKnn((void *)&(G.Nodes[i]->vec[0]) ,K);
+        
+        std::set<int> ans;
+        auto testresult = OGS_KDT_Routing(G,p.get(),G.Nodes[i].get(),l);
+        for(auto tt:testresult){
+            ans.insert(tt -> index);
+        }
+        while(!result.empty()){
+            auto now = result.top(); result.pop();
+            if(ans.find(now.second) != ans.end()){
+                correct ++;
+            }
+        }
+
     }
+    float recall = 1.0 * correct / N / K;
+    
+    std::cout << "The recall is" <<  recall << std::endl;
 
     std::cout << "End of testing the OGS_KDT_Routing function" << std::endl;
     delete_HNSW(alg);
+
+
 }
 
 int main(){
