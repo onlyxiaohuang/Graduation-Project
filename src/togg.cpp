@@ -52,7 +52,7 @@ int get_div_dim(Graph &G,Node * p,__type r_proportion){
 }
 
 //TOGG Algorithm-2
-std::vector<Node *> OGS_KDT_Routing(Graph &G,Node *p,Node *q,int L){
+std::vector<Node *> OGS_KDT_Routing(Graph &G,Node *p,Node *q,int l){
 
     int i = 0,ddim = get_div_dim(G,p,r_proportion);
 
@@ -80,7 +80,7 @@ std::vector<Node *> OGS_KDT_Routing(Graph &G,Node *p,Node *q,int L){
             continue;
         }
         Visited.insert(tt);
-        
+        std::cout << tt->index << std::endl;
 //        if()
 
         int ddim = get_div_dim(G,(Node *)tt,r_proportion);
@@ -109,10 +109,12 @@ std::vector<Node *> OGS_KDT_Routing(Graph &G,Node *p,Node *q,int L){
         //Delete element
         auto it2 = C.begin();
         int cnt = 0;
-        for(;it2 != C.end();it2++){
+        for(;it2 != C.end();){
             cnt ++;
-            if(cnt > L){
+            if(cnt > l){
                 it2 = C.erase(it2);
+            }else{
+                it2 ++;
             }
         }
         

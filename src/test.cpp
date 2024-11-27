@@ -145,9 +145,9 @@ void test_OGS_KDT_Routing(){
 int main(){
     
 //    test_rand();
-    test_build_graph();
+//    test_build_graph();
 //    test_Get_Linklists();
 //    test_Get_Graph();
-//    test_OGS_KDT_Routing();
+    test_OGS_KDT_Routing();
     return 0;
 }
