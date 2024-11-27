@@ -16,13 +16,20 @@ Graph initialize(int N,int L,int R,int seed,int dim){//N nodes with vector in ra
     
     Graph G;
     for(int i = 1;i <= N;i ++){
-        Node node;
-        node.index = i ;
+        std::shared_ptr<Node> ptr(new Node());
+        ptr -> index = i;
         for (int j = 1; j <= dim;j ++){
-            node.vec.push_back(random_int(rd,L,R));
+            __type tmp = random_int(rd,L,R);
+            ptr -> vec.push_back(random_int(rd,L,R));
+            //std::cout <<random_int(rd,L,R) << std::endl;
         }
-        G.Nodes.push_back(&node);
+        G.Nodes.push_back(ptr);
     }
+
+    //for(auto tt:G.Nodes){
+    //    std::cout << tt->vec[0] << std::endl;
+    //}
+
     return G;
 }
 

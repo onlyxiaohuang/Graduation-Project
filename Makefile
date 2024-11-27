@@ -27,20 +27,20 @@ togg:
 main: main.o 
 	$(G++) ./output/main.o ./output/utils.o ./output/hnsw.o ./output/togg.o -o ./output/main
 
-main.o: ./src/main.cpp utils hnsw
+main.o: ./src/main.cpp utils hnsw togg
 	$(G++) $(CFLAGS) -c ./src/main.cpp -o ./output/main.o
 
 debugmain: debugmain.o
 	$(G++) ./output/main.o ./output/utils.o ./output/hnsw.o ./output/togg.o -o ./output/main
 
-debugmain.o: ./src/main.cpp utils hnsw
+debugmain.o: ./src/main.cpp utils hnsw togg
 	$(G++) $(CFLAGS) -c $(CDEBUG) ./src/main.cpp -o ./output/main.o
 
 #MAKE TEST
 test: test.o 
 	$(G++) ./output/test.o ./output/utils.o ./output/hnsw.o ./output/togg.o -o ./output/test
 
-test.o: ./src/test.cpp utils hnsw
+test.o: ./src/test.cpp utils hnsw togg
 	$(G++) $(CFLAGS) -c $(CDEBUG) ./src/test.cpp -o ./output/test.o	
 
 

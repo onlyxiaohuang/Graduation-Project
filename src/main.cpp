@@ -62,14 +62,14 @@ std::vector<const Node*> Greedy_Graph_Search(Node* q,Node* p,int efs){ //FINGER 
         }
         
         for(auto n:cur->tonode){
-            if(V.find(n) != V.end()){
+            if(V.find(n.get()) != V.end()){
                 continue;
             }
 
-            V.insert(n);
+            V.insert(n.get());
 
             if(dis(n->vec,q->vec) - eps <= dist + eps || T.size() <= efs){
-                T.insert(n);
+                T.insert(n.get());
                 if(T.size() > efs){
                     T.erase(T.begin());
                 }
@@ -103,7 +103,7 @@ int main(){
     }    
     Get_Graph(G,alg);
 
-    auto T = Greedy_Graph_Search(G.Nodes[0],G.Nodes[1],5);
+    auto T = Greedy_Graph_Search(G.Nodes[0].get(),G.Nodes[1].get(),5);
     
     std::cout << "The results are:" << std::endl;
     

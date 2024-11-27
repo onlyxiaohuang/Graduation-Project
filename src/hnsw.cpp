@@ -1,7 +1,8 @@
 #include "hnsw.hpp"
 
-extern const int dim,N,L,R;
+//extern const int dim,N,L,R;
 
+//extern const int debug;
 const int ef_construction = 200,neighbor_size = 516;
 hnswlib::HierarchicalNSW<__type>* alg_hnsw = NULL;
 
@@ -10,24 +11,30 @@ hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G){//build graph by HN
     hnswlib::L2Space space(dim);
     alg_hnsw = new hnswlib::HierarchicalNSW<__type>(&space, N, neighbor_size ,ef_construction);
     
-
+    //std::cout << debug << std::endl;
 
     //Add data to index
     for(int i = 0;i < N;i ++){
-        alg_hnsw -> addPoint((void*)&G.Nodes[i]->vec[0],i);
+        alg_hnsw -> addPoint((void*)&(G.Nodes[i]->vec[0]),i);
     }        
 
     if(debug == 1){
-        std::cout << "Start for testing, address of alg_hnsw is "  << std::endl; 
+        std::cout << "Start testing, address of alg_hnsw is .."  << std::endl; 
         std::cout << alg_hnsw << std::endl;
+        //std::cout << N << std::endl;
     }
 
     // Query the elements for themselves and measure recall
     float correct = 0;
     for (int i = 0; i < N; i++) {
-        std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg_hnsw->searchKnn((void*)&G.Nodes[i]->vec[0], 1);
+        std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg_hnsw->searchKnn((void*)&(G.Nodes[i]->vec[0]), 1);
         hnswlib::labeltype label = result.top().second;
         if (label == i) correct++;
+
+        //if(debug == 1){
+        //    std::cout << G.Nodes[i]->vec[0] << std::endl;
+        //}
+
     }
     float recall = correct / N;
     std::cout << "Recall: " << recall << "\n";
@@ -43,12 +50,12 @@ hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G){//build graph by HN
     alg_hnsw = new hnswlib::HierarchicalNSW<__type>(&space, hnsw_path);
 
     if(debug == 1){
-        std::cout << "Start for testing, address of alg_hnsw is "  << std::endl; 
+        std::cout << "Start testing, address of alg_hnsw is *"  << std::endl; 
         std::cout << alg_hnsw << std::endl;
     }
     correct = 0;
     for (int i = 0; i < N; i++) {
-        std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg_hnsw->searchKnn((void*)&G.Nodes[i]->vec[0], 1);
+        std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg_hnsw->searchKnn((void*)&(G.Nodes[i]->vec[0]), 1);
         hnswlib::labeltype label = result.top().second;
         if (label == i) correct++;
     }
@@ -69,7 +76,7 @@ void Get_Graph(Graph &G,hnswlib::HierarchicalNSW<__type>* alg){
             int size = alg -> getListCount(ll_cur);
             hnswlib::tableint *data = (hnswlib::tableint *) (ll_cur + 1);
             
-            std::vector <Node *> tonode;
+            std::vector < std::shared_ptr<Node> > tonode;
 
             for(int j = 0;j < size;j ++){
                 //std::cout << "The " << j << "th neighbor is " << data[j] << std::endl;

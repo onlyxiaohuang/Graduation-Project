@@ -9,6 +9,7 @@
 #include <random>
 #include <assert.h>
 #include <algorithm>
+#include <memory>
 
 // debug
 #ifndef DEBUG
@@ -47,7 +48,7 @@ struct Node
     std::vector<__type> vec;
 
     //the neighbors of the Node
-    std::vector<Node *> tonode;
+    std::vector< std::shared_ptr< Node> > tonode;
 
 };
 
@@ -56,7 +57,12 @@ struct Graph
     Graph(){
     //    Nodes.resize(N);
     }
-    std::vector<Node *> Nodes;
+    ~Graph(){
+        for(auto tt:Nodes){
+            tt.reset();
+        }
+    }
+    std::vector<std::shared_ptr<Node> > Nodes;
 };
 
 std::mt19937 &random_begin(unsigned int seed);

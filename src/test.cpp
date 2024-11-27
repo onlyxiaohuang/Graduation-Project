@@ -58,6 +58,10 @@ void test_build_graph(){
     */
     
     G = initialize(N,L,R,seed,dim);
+    //for(auto tt:G.Nodes){
+    //    std::cout << tt->vec[0] << std::endl;
+    //}
+
     alg = build_graph_HNSW(G);
 
     if(debug == 1){
@@ -113,12 +117,37 @@ void test_Get_Graph(){
     delete_HNSW(alg);
 }
 
+//TEST TOGG Algorithm 1 & 2
+extern std::vector<Node *> OGS_KDT_Routing(Graph &G,Node *p,Node *q,int L);
+void test_OGS_KDT_Routing(){
+    std::cout << "Starting testing the OGS_KDT_Routing function" << std::endl;
+    //build the Graph
+    G = initialize(N,L,R,seed,dim);
+
+
+    alg = build_graph_HNSW(G);
+    Get_Graph(G,alg);
+
+    //testing the OGS
+    std::shared_ptr<Node> p = *G.Nodes.begin(), q = *G.Nodes.rbegin();
+    int l = 10;
+    auto RetAns = OGS_KDT_Routing(G,p.get(),q.get(),l);
+    
+    std::cout << "The result is:" << std::endl;
+    for(auto tt:RetAns){
+        std::cout << tt << " ";
+    }
+
+    std::cout << "End of testing the OGS_KDT_Routing function" << std::endl;
+    delete_HNSW(alg);
+}
+
 int main(){
     
-    test_rand();
+//    test_rand();
     test_build_graph();
-    test_Get_Linklists();
-    test_Get_Graph();
-    
+//    test_Get_Linklists();
+//    test_Get_Graph();
+//    test_OGS_KDT_Routing();
     return 0;
 }

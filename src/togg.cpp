@@ -1,8 +1,9 @@
-#include "TOGG.hpp"
+#include "togg.hpp"
 
 
 //TOGG Algorithm-1
-NeighborTree OGS_KDT(Node *p,int ddim,std::vector<__type> &g){
+NeighborTree OGS_KDT(Node* p,int ddim,std::vector<__type> &g){
+    
     assert(ddim < p -> vec.size());    
     assert(ddim < g.size());
 
@@ -10,13 +11,13 @@ NeighborTree OGS_KDT(Node *p,int ddim,std::vector<__type> &g){
     T.dim = ddim;
     for(auto tt:p->tonode){
         if( tt->vec[ddim] - p->vec[ddim] <= -g[ddim] ){
-            T.left.push_back(tt);
+            T.left.push_back(tt.get());
         }
         else if( tt->vec[ddim] - p->vec[ddim] >= g[ddim] ){
-            T.right.push_back(tt);
+            T.right.push_back(tt.get());
         }
         else{
-            T.common.push_back(tt);
+            T.common.push_back(tt.get());
         }
     }
     
@@ -25,7 +26,7 @@ NeighborTree OGS_KDT(Node *p,int ddim,std::vector<__type> &g){
 }
 
 //From TOGG Algorithm-2
-int get_div_dim(Graph &G,Node *p,__type r_proportion){
+int get_div_dim(Graph &G,Node * p,__type r_proportion){
     int dim_sz = p -> vec.size();
     __type range_size = *std::max_element(p -> vec.begin() , p -> vec.end()) - *std::min_element(p -> vec.begin(), p -> vec.end());
 
@@ -69,12 +70,59 @@ std::vector<Node *> OGS_KDT_Routing(Graph &G,Node *p,Node *q,int L){
     C.insert(p);
     //std::unordered_set <Node*> Visited;//visited set
 
-    for(auto tt:C){
+    //
+    auto it = C.begin();
+    while(it != C.end()){
+        
+        auto tt = *it;
+        if(Visited.find(*it) != Visited.end()){
+            it++;
+            continue;
+        }
         Visited.insert(tt);
         
+//        if()
+
         int ddim = get_div_dim(G,(Node *)tt,r_proportion);
         auto T = OGS_KDT((Node *)tt,ddim,g);
+
+        std::vector<Node *> Z;
+        for(auto tt2:T.common){
+            Z.push_back(tt2);
+        }
+        if(q -> vec[ddim] - tt -> vec[ddim] <= -g[ddim]){
+            for(auto tt2:T.left){
+                Z.push_back(tt2);
+            }
+        }
+        else if(q -> vec[ddim] - tt -> vec[ddim] >= g[ddim]) {
+            for(auto tt2:T.right){
+                Z.push_back(tt2);
+            }
+        }
+        for(auto tt2:Z){
+            for(auto nn:tt2->tonode){
+                C.insert(nn.get());
+            }
+        }
+
+        //Delete element
+        auto it2 = C.begin();
+        int cnt = 0;
+        for(;it2 != C.end();it2++){
+            cnt ++;
+            if(cnt > L){
+                it2 = C.erase(it2);
+            }
+        }
+        
+
+        it = C.begin();
     }
 
-
+    std::vector<Node *> ret;
+    for(auto tt:C){
+        ret.push_back((Node *)tt);
+    }
+    return ret;
 }
