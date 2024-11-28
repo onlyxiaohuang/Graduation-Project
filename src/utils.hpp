@@ -32,6 +32,9 @@ const __type eps = 1e-7;
 //r_proportion
 const __type r_proportion = 0.5;
 
+//gist
+const int gist_dim = 960, gist_base = 1000000, gist_query = 1000, gist_learn = 500000;
+
 struct Node
 {
     Node() = default;

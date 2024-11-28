@@ -35,3 +35,11 @@ http://corpus-texmex.irisa.fr/
 
 压测:
 https://github.com/wg/wrk
+
+hnsw不保证路径可达
+
+nsg图 满足单调下降
+
+io数 平均跳数 每查询的io数
+
+多测指标
