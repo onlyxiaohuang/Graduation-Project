@@ -251,6 +251,7 @@ void test_Greedy_Search(){
         for(auto tt:testresult){
             ans.insert(tt -> index);
             std::cout << tt -> index << " ";
+            std::cout << "dis:" << dis(tt -> vec,G.Nodes[i]->vec) << " ";
         }
         std::cout << std::endl;
 
@@ -258,6 +259,7 @@ void test_Greedy_Search(){
         while(!result.empty()){
             auto now = result.top(); result.pop();
             std::cout << now.second << " ";
+            std::cout << "dis:" << dis(G.Nodes[now.second] -> vec,G.Nodes[i]->vec) << " ";
             if(ans.find(now.second) != ans.end()){
                 correct ++;
             }

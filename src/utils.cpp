@@ -109,6 +109,9 @@ std::vector<const Node*> Greedy_Graph_Search(Node* q,Node* p,int efs){ //FINGER 
             else break;
         }
 
+        if(C.size() == 0){
+            break;
+        }
 
         auto cur = *it;
         V.insert((Node *)cur);
