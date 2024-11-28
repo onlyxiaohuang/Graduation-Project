@@ -138,8 +138,10 @@ void test_OGS_KDT_Routing(){
 //        std::cout << tt << " ";
 //    }
 
-    int correct = 0,K = 10;//recall@K
-    for(int i = 0;i < N;i ++){
+    int correct = 0,K = 1;//recall@K
+
+    int testdata = 10;
+    for(int i = 0;i < testdata;i ++){
         std::cout << "*" << i << std::endl;
         auto result = alg -> searchKnn((void *)&(G.Nodes[i]->vec[0]) ,K);
         
@@ -156,7 +158,7 @@ void test_OGS_KDT_Routing(){
         }
 
     }
-    float recall = 1.0 * correct / N / K;
+    float recall = 1.0 * correct / testdata / K;
     
     std::cout << "The recall is" <<  recall << std::endl;
 
@@ -165,6 +167,7 @@ void test_OGS_KDT_Routing(){
 
 
 }
+
 
 int main(){
     
