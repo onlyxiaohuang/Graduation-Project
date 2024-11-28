@@ -131,6 +131,26 @@ std::vector<Node *> OGS_KDT_Routing(Graph &G,Node *p,Node *q,int l){
 }
 
 //TOGG algorithm 5
-void OGA_routing(Graph &G,std::vector <std::shared_ptr<Node> > C,Node *q,int l){
+std::vector<Node *> OGA_routing(Graph &G,std::vector <Node *> C,Node *q,int l){
+    auto cmp = [&q](const Node *a,const Node *b) -> bool{
+        return dis(a->vec,q->vec) < dis(b->vec,q->vec);
+    };//the increasing order
+
+    std::set<const Node*, decltype(cmp)> Visited(cmp);
+
+    __type range = dis((*C.rbegin())->vec,q->vec);
+
+    int i = 0;
+    while(i < l){
+        for(i = 0;i < l;i ++){
+            if(Visited.find(C[i]) == Visited.end()){
+                break;
+            }
+        }
+        if(i >= l)  break;
+        Visited.insert(C[i]);
+        
+
+    }
     
 }

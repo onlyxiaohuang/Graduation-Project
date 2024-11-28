@@ -188,6 +188,7 @@ void test_load_data(){
         G.Nodes.push_back(tt);
     }
 
+    delete data;
 
     std::cout << "End of testing the loading data" << std::endl;
 
@@ -228,6 +229,7 @@ void test_Greedy_Search(){
 
     std::cout << "End of testing the greedy search by using gist" << std::endl;
 }
+
 
 int main(){
     
