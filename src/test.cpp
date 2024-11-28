@@ -168,7 +168,35 @@ void test_OGS_KDT_Routing(){
 
 //TEST LOADING DATA
 extern void load_data(char* filename,float*& data, unsigned& num,unsigned& dim);
-void test_load_data(){
+
+void test_load_data_sift(){
+    std::cout << "Start testing the loading data" << std::endl;
+
+    char* filename = "./test/sift/sift_base.fvecs";
+    //gist
+    __type *data = NULL;
+    unsigned int gb = sift_base,dm = sift_dim;
+    load_data(filename,data,gb,dm);
+    
+    int nowindex = 0;
+    G.Nodes.resize(gb);
+    for(int num = 0; num < gb;num ++){
+        std::shared_ptr<Node> tt = std::make_shared<Node>();
+        //std::cout << nowindex << std::endl;
+        for(int i = 0; i < dm;i ++){
+            tt->vec.push_back(data[nowindex ++]);
+        }
+        G.Nodes.push_back(tt);
+    }
+
+    delete data;//free the data 一定要删掉
+    
+
+    std::cout << "End of testing the loading data" << std::endl;
+
+}
+
+void test_load_data_gist(){
     std::cout << "Start testing the loading data" << std::endl;
 
     char* filename = "./test/gist/gist_base.fvecs";
@@ -198,7 +226,7 @@ void test_load_data(){
 extern std::vector<const Node*> Greedy_Graph_Search(Node* q,Node* p,int efs);
 void test_Greedy_Search(){
     std::cout << "Start testing the greedy search by using gist" << std::endl;
-    test_load_data();
+    test_load_data_sift();
     
     std::cout << "Start getting the HNSW Graph" << std::endl;
     alg = build_graph_HNSW(G,gist_base);

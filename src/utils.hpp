@@ -32,6 +32,9 @@ const __type eps = 1e-7;
 //r_proportion
 const __type r_proportion = 0.5;
 
+//sift
+const int sift_dim = 128, sift_base = 10000, sift_query = 100, sift_learn = 25000;
+
 //gist
 const int gist_dim = 960, gist_base = 1000000, gist_query = 1000, gist_learn = 500000;
 
