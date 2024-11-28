@@ -166,6 +166,30 @@ void test_OGS_KDT_Routing(){
 
 }
 
+//TEST LOADING DATA
+extern void load_data(char* filename,float*& data, unsigned& num,unsigned& dim);
+void test_load_data(){
+    std::cout << "Start testing the loading data" << std::endl;
+
+    char* filename = "../test/gist/gist_base.fvecs";
+    //gist
+    __type *data = NULL;
+    unsigned int gb = gist_base,dm = gist_dim;
+    load_data(filename,data,gb,dm);
+    
+    int nowindex = 0;
+    G.Nodes.resize(gb);
+    for(auto &tt: G.Nodes){
+        tt->vec.resize(dm);
+        for(int i = 0; i < dm;i ++){
+            tt->vec[i] = data[nowindex ++];
+        }
+    }
+
+    std::cout << "End of testing the loading data" << std::endl;
+
+}
+
 int main(){
     
 //    test_rand();

@@ -129,3 +129,8 @@ std::vector<Node *> OGS_KDT_Routing(Graph &G,Node *p,Node *q,int l){
 //    std::cout << "finished" << std::endl;
     return ret;
 }
+
+//TOGG algorithm 5
+void OGA_routing(Graph &G,std::vector <std::shared_ptr<Node> > C,Node *q,int l){
+    
+}
