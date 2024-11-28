@@ -8,8 +8,9 @@ FILE=./test/gist.tar.gz
 #else
     sudo apt-get install -y curl
 #fi
+mkdir test
 if [ ! -f "./test/gist.tar.gz" ]; then
-    curl ftp://ftp.irisa.fr/local/texmex/corpus/gist.tar.gz >> ./test/gist.tar.gz
+    curl ftp://ftp.irisa.fr/local/texmex/corpus/gist.tar.gz --output ./test/gist.tar.gz
 fi
 
 
