@@ -101,6 +101,7 @@ std::vector<const Node*> Greedy_Graph_Search(Node* q,Node* p,int efs){ //FINGER 
     T.insert(p);   C.insert(p);
     while(!C.empty()){
         auto cur = *C.begin();
+        std::cout << cur << std::endl;
 
         if(debug == 1){
             std::cout << &cur << std::endl;

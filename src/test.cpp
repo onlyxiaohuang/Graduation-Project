@@ -30,7 +30,7 @@ void test_rand(){
 }
 
 //TESTING FOR HNSW.cpp
-hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G, int N,int ef_construction = 200,int neighbor_size = 516);
+hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G, int N,int Dim = dim,int ef_construction = 200,int neighbor_size = 516);
 extern void delete_HNSW(hnswlib::HierarchicalNSW<__type>* alg_hnsw);
 hnswlib::HierarchicalNSW<__type>* alg;
 extern Graph initialize(int N,int L,int R,int seed,int dim);
@@ -172,7 +172,7 @@ extern void load_data(char* filename,float*& data, unsigned& num,unsigned& dim);
 void test_load_data_sift(){
     std::cout << "Start testing the loading data" << std::endl;
 
-    char* filename = "./test/sift/sift_base.fvecs";
+    char* filename = "./test/siftsmall/siftsmall_base.fvecs";
     //gist
     __type *data = NULL;
     unsigned int gb = sift_base,dm = sift_dim;
@@ -181,12 +181,14 @@ void test_load_data_sift(){
     int nowindex = 0;
     G.Nodes.resize(gb);
     for(int num = 0; num < gb;num ++){
-        std::shared_ptr<Node> tt = std::make_shared<Node>();
+        G.Nodes[num] = std::make_shared<Node>();
+        auto &tt = G.Nodes[num];
         //std::cout << nowindex << std::endl;
         for(int i = 0; i < dm;i ++){
             tt->vec.push_back(data[nowindex ++]);
         }
-        G.Nodes.push_back(tt);
+        tt -> index = num;
+        //G.Nodes.push_back(tt);
     }
 
     delete data;//free the data 一定要删掉
@@ -208,12 +210,14 @@ void test_load_data_gist(){
     int nowindex = 0;
     G.Nodes.resize(gb);
     for(int num = 0; num < gb;num ++){
-        std::shared_ptr<Node> tt = std::make_shared<Node>();
+        G.Nodes[num] = std::make_shared<Node>();
+        auto &tt = G.Nodes[num];
         //std::cout << nowindex << std::endl;
         for(int i = 0; i < dm;i ++){
             tt->vec.push_back(data[nowindex ++]);
         }
-        G.Nodes.push_back(tt);
+        tt -> index = num;
+        //G.Nodes.push_back(tt);
     }
 
     delete data;//free the data 一定要删掉
@@ -229,7 +233,7 @@ void test_Greedy_Search(){
     test_load_data_sift();
     
     std::cout << "Start getting the HNSW Graph" << std::endl;
-    alg = build_graph_HNSW(G,gist_base);
+    alg = build_graph_HNSW(G,sift_base,sift_dim);
     Get_Graph(G,alg);
     std::cout << "End of getting the HNSW Graph" << std::endl;
 
@@ -241,16 +245,24 @@ void test_Greedy_Search(){
         auto result = alg -> searchKnn((void *)&(G.Nodes[i]->vec[0]) ,K);
         
         std::set<int> ans;
-        auto testresult = Greedy_Graph_Search(G.Nodes[0].get(),G.Nodes[i].get(),K);
+
+        auto testresult = Greedy_Graph_Search(G.Nodes[i].get(),G.Nodes[0].get(),K);
+        std::cout << "testresult:" << std::endl;
         for(auto tt:testresult){
             ans.insert(tt -> index);
+            std::cout << tt -> index << " ";
         }
+        std::cout << std::endl;
+
+        std::cout << "Ansresult:" << std::endl;
         while(!result.empty()){
             auto now = result.top(); result.pop();
+            std::cout << now.second << " ";
             if(ans.find(now.second) != ans.end()){
                 correct ++;
             }
         }
+        std::cout << std::endl;
 
     }
     float recall = 1.0 * correct / testnum / K;

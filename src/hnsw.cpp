@@ -6,14 +6,14 @@
 //const int ef_construction = 200,neighbor_size = 516;
 hnswlib::HierarchicalNSW<__type>* alg_hnsw = NULL;
 
-hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G, int N,int ef_construction = 200,int neighbor_size = 516){
+hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G, int N,int Dim = dim,int ef_construction = 200,int neighbor_size = 516){
     //build graph by HNSW
     // Initializing index, and __type here only for "float"
-    hnswlib::L2Space space(dim);
+    hnswlib::L2Space space(Dim);
     alg_hnsw = new hnswlib::HierarchicalNSW<__type>(&space, N, neighbor_size ,ef_construction);
     
     //std::cout << debug << std::endl;
-
+    std::cout << 1 <<std::endl;
     //Add data to index
     for(int i = 0;i < N;i ++){
         alg_hnsw -> addPoint((void*)&(G.Nodes[i]->vec[0]),i);
@@ -24,7 +24,7 @@ hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G, int N,int ef_constr
         std::cout << alg_hnsw << std::endl;
         //std::cout << N << std::endl;
     }
-
+    std::cout << 2 << std::endl;
     // Query the elements for themselves and measure recall
     float correct = 0;
     for (int i = 0; i < N; i++) {
