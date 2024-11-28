@@ -188,7 +188,8 @@ void test_load_data(){
         G.Nodes.push_back(tt);
     }
 
-    delete data;
+    delete data;//free the data 一定要删掉
+    
 
     std::cout << "End of testing the loading data" << std::endl;
 
