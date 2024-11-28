@@ -75,3 +75,5 @@ int random_int(std::mt19937 &rd, int l, int r); // return a random integer with 
 Graph initialize(int N, int L, int R, int seed, int dim);
 
 __type dis(const std::vector<__type> &x,const std::vector<__type> &y);
+
+std::vector<const Node*> Greedy_Graph_Search(Node* q,Node* p,int efs);

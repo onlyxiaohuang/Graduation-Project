@@ -138,10 +138,8 @@ void test_OGS_KDT_Routing(){
 //        std::cout << tt << " ";
 //    }
 
-    int correct = 0,K = 1;//recall@K
-
-    int testdata = 10;
-    for(int i = 0;i < testdata;i ++){
+    int correct = 0,K = 10;//recall@K
+    for(int i = 0;i < N;i ++){
         std::cout << "*" << i << std::endl;
         auto result = alg -> searchKnn((void *)&(G.Nodes[i]->vec[0]) ,K);
         
@@ -158,7 +156,7 @@ void test_OGS_KDT_Routing(){
         }
 
     }
-    float recall = 1.0 * correct / testdata / K;
+    float recall = 1.0 * correct / N / K;
     
     std::cout << "The recall is" <<  recall << std::endl;
 
@@ -168,6 +166,68 @@ void test_OGS_KDT_Routing(){
 
 }
 
+//TEST LOADING DATA
+extern void load_data(char* filename,float*& data, unsigned& num,unsigned& dim);
+void test_load_data(){
+    std::cout << "Start testing the loading data" << std::endl;
+
+    char* filename = "./test/gist/gist_base.fvecs";
+    //gist
+    __type *data = NULL;
+    unsigned int gb = gist_base,dm = gist_dim;
+    load_data(filename,data,gb,dm);
+    
+    int nowindex = 0;
+    G.Nodes.resize(gb);
+    for(int num = 0; num < gb;num ++){
+        std::shared_ptr<Node> tt = std::make_shared<Node>();
+        //std::cout << nowindex << std::endl;
+        for(int i = 0; i < dm;i ++){
+            tt->vec.push_back(data[nowindex ++]);
+        }
+        G.Nodes.push_back(tt);
+    }
+
+
+    std::cout << "End of testing the loading data" << std::endl;
+
+}
+
+extern std::vector<const Node*> Greedy_Graph_Search(Node* q,Node* p,int efs);
+void test_Greedy_Search(){
+    std::cout << "Start testing the greedy search by using gist" << std::endl;
+    test_load_data();
+    
+    std::cout << "Start getting the HNSW Graph" << std::endl;
+    alg = build_graph_HNSW(G);
+    Get_Graph(G,alg);
+    std::cout << "End of getting the HNSW Graph" << std::endl;
+
+    //ask for recall
+    int testnum = 10;
+    int correct = 0,K = 10;//recall@K
+    for(int i = 0;i < testnum;i ++){
+        std::cout << "*" << i << std::endl;
+        auto result = alg -> searchKnn((void *)&(G.Nodes[i]->vec[0]) ,K);
+        
+        std::set<int> ans;
+        auto testresult = Greedy_Graph_Search(G.Nodes[0].get(),G.Nodes[i].get(),K);
+        for(auto tt:testresult){
+            ans.insert(tt -> index);
+        }
+        while(!result.empty()){
+            auto now = result.top(); result.pop();
+            if(ans.find(now.second) != ans.end()){
+                correct ++;
+            }
+        }
+
+    }
+    float recall = 1.0 * correct / testnum / K;
+    std::cout << "Recall@" << K << " is " << recall << "." << std::endl;
+
+    std::cout << "End of testing the greedy search by using gist" << std::endl;
+}
 
 int main(){
     
@@ -175,6 +235,7 @@ int main(){
 //    test_build_graph();
 //    test_Get_Linklists();
 //    test_Get_Graph();
-    test_OGS_KDT_Routing();
+//    test_OGS_KDT_Routing();
+    test_Greedy_Search();
     return 0;
 }
