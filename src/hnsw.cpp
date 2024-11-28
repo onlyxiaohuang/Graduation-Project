@@ -3,10 +3,11 @@
 //extern const int dim,N,L,R;
 
 //extern const int debug;
-const int ef_construction = 200,neighbor_size = 516;
+//const int ef_construction = 200,neighbor_size = 516;
 hnswlib::HierarchicalNSW<__type>* alg_hnsw = NULL;
 
-hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G, int N,int ef_construction = 200,int neighbor_size = 516){//build graph by HNSW
+hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G, int N,int ef_construction = 200,int neighbor_size = 516){
+    //build graph by HNSW
     // Initializing index, and __type here only for "float"
     hnswlib::L2Space space(dim);
     alg_hnsw = new hnswlib::HierarchicalNSW<__type>(&space, N, neighbor_size ,ef_construction);

@@ -30,7 +30,7 @@ void test_rand(){
 }
 
 //TESTING FOR HNSW.cpp
-extern hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G);
+hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G, int N,int ef_construction = 200,int neighbor_size = 516);
 extern void delete_HNSW(hnswlib::HierarchicalNSW<__type>* alg_hnsw);
 hnswlib::HierarchicalNSW<__type>* alg;
 extern Graph initialize(int N,int L,int R,int seed,int dim);
@@ -62,7 +62,7 @@ void test_build_graph(){
     //    std::cout << tt->vec[0] << std::endl;
     //}
 
-    alg = build_graph_HNSW(G);
+    alg = build_graph_HNSW(G,N);
 
     if(debug == 1){
         std::cout << "Start for testing, address of alg_hnsw is "  << std::endl; 
@@ -77,7 +77,7 @@ void test_Get_Linklists(){
     std::cout << "Starting testing the graph get_linklists function" << std::endl;
     
     G = initialize(N,L,R,seed,dim);
-    alg = build_graph_HNSW(G);
+    alg = build_graph_HNSW(G,N);
     
     for(int i = 0;i < alg -> cur_element_count;i ++){//枚举每一个点的邻居
         std::cout << "Considering the Node " << i <<"'s neighbors:" << std::endl;
@@ -104,7 +104,7 @@ void test_Get_Linklists(){
 void Get_Graph(Graph &G,hnswlib::HierarchicalNSW<__type>* alg);
 void test_Get_Graph(){
     G = initialize(N,L,R,seed,dim);
-    alg = build_graph_HNSW(G);
+    alg = build_graph_HNSW(G,N);
     Get_Graph(G,alg);
 
     for(int i = 0; i < G.Nodes.size(); i ++){
@@ -125,7 +125,7 @@ void test_OGS_KDT_Routing(){
     G = initialize(N,L,R,seed,dim);
 
 
-    alg = build_graph_HNSW(G);
+    alg = build_graph_HNSW(G,N);
     Get_Graph(G,alg);
 
     //testing the OGS
@@ -199,7 +199,7 @@ void test_Greedy_Search(){
     test_load_data();
     
     std::cout << "Start getting the HNSW Graph" << std::endl;
-    alg = build_graph_HNSW(G);
+    alg = build_graph_HNSW(G,gist_base);
     Get_Graph(G,alg);
     std::cout << "End of getting the HNSW Graph" << std::endl;
 
