@@ -39,6 +39,7 @@ debugmain.o: ./src/main.cpp utils hnsw togg
 #MAKE TEST
 test: test.o 
 	$(G++) ./output/test.o ./output/utils.o ./output/hnsw.o ./output/togg.o -o ./output/test
+	./output/test
 
 test.o: ./src/test.cpp utils hnsw togg
 	$(G++) $(CFLAGS) -c $(CDEBUG) ./src/test.cpp -o ./output/test.o	

@@ -234,15 +234,33 @@ void test_Greedy_Search(){
     
     std::cout << "Start getting the HNSW Graph" << std::endl;
     alg = build_graph_HNSW(G,sift_base,sift_dim);
+    std::cout << alg << std::endl;
+
+    int correct = 0;
+
+    //for (int i = 0; i < N; i++) {
+    //    std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg->searchKnn((void*)&(G.Nodes[i]->vec[0]), 1);
+    //    hnswlib::labeltype label = result.top().second;
+    //    if (label == i) correct++;
+    //    std::cout << "label is " << label << std::endl;
+
+        //if(debug == 1){
+        //    std::cout << G.Nodes[i]->vec[0] << std::endl;
+        //}
+
+//    }
+
     Get_Graph(G,alg);
+    std::cout << alg << std::endl;
     std::cout << "End of getting the HNSW Graph" << std::endl;
 
     //ask for recall
     int testnum = 10;
-    int correct = 0,K = 10;//recall@K
+    int K = 10;//recall@K
     for(int i = 0;i < testnum;i ++){
+
         std::cout << "*" << i << std::endl;
-        auto result = alg -> searchKnn((void *)&(G.Nodes[i]->vec[0]) ,K);
+        std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg->searchKnn((void*)&(G.Nodes[i]->vec[0]), K);
         
         std::set<int> ans;
 
@@ -256,7 +274,8 @@ void test_Greedy_Search(){
         std::cout << std::endl;
 
         std::cout << "Ansresult:" << std::endl;
-        while(!result.empty()){
+        int dd = K;
+        while(dd--){
             auto now = result.top(); result.pop();
             std::cout << now.second << " ";
             std::cout << "dis:" << dis(G.Nodes[now.second] -> vec,G.Nodes[i]->vec) << " ";
@@ -266,11 +285,97 @@ void test_Greedy_Search(){
         }
         std::cout << std::endl;
 
+    //    std::cout << "Now Node:" << std::endl;
+    //    std::cout << i <<" " <<  dis(G.Nodes[i] -> vec,G.Nodes[i] -> vec) << std::endl;
+
     }
     float recall = 1.0 * correct / testnum / K;
     std::cout << "Recall@" << K << " is " << recall << "." << std::endl;
 
     std::cout << "End of testing the greedy search by using gist" << std::endl;
+    delete alg;
+}
+
+extern std::vector<Node *> OGS_KDT_Routing(Graph &G,Node *p,Node *q,int l);
+extern std::vector<Node *> OGA_routing(Graph &G,std::vector <Node *> C,Node *q,int l);
+
+void test_TOGG(int testnum = 10,int K = 10){
+    time_t start,stop;
+
+    std::cout << "Start testing the TOGG search by using gist" << std::endl;
+    test_load_data_sift();
+    
+    std::cout << "Start getting the HNSW Graph" << std::endl;
+    alg = build_graph_HNSW(G,sift_base,sift_dim);
+    std::cout << alg << std::endl;
+
+    int correct = 0;
+
+    //for (int i = 0; i < N; i++) {
+    //    std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg->searchKnn((void*)&(G.Nodes[i]->vec[0]), 1);
+    //    hnswlib::labeltype label = result.top().second;
+    //    if (label == i) correct++;
+    //    std::cout << "label is " << label << std::endl;
+
+        //if(debug == 1){
+        //    std::cout << G.Nodes[i]->vec[0] << std::endl;
+        //}
+
+//    }
+
+    Get_Graph(G,alg);
+    std::cout << alg << std::endl;
+    std::cout << "End of getting the HNSW Graph" << std::endl;
+
+    //ask for recall
+    //recall@K
+    start = time(NULL);
+    for(int i = 0;i < testnum;i ++){
+
+        std::cout << "*" << i << std::endl;
+        std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg->searchKnn((void*)&(G.Nodes[i]->vec[0]), K);
+        
+        std::set<int> ans;
+
+        std::vector <Node*> testresult;
+        testresult = OGS_KDT_Routing(G,G.Nodes[0].get(),G.Nodes[i].get(),K);
+        testresult = OGA_routing(G,testresult,G.Nodes[i].get(),K);
+
+        std::cout << "testresult:" << std::endl;
+        for(auto tt:testresult){
+            ans.insert(tt -> index);
+            std::cout << tt -> index << " ";
+            std::cout << "dis:" << dis(tt -> vec,G.Nodes[i]->vec) << " ";
+        }
+        std::cout << std::endl;
+
+        std::cout << "Ansresult:" << std::endl;
+        int dd = K;
+        while(dd--){
+            auto now = result.top(); result.pop();
+            std::cout << now.second << " ";
+            std::cout << "dis:" << dis(G.Nodes[now.second] -> vec,G.Nodes[i]->vec) << " ";
+            if(ans.find(now.second) != ans.end()){
+                correct ++;
+            }
+        }
+        std::cout << std::endl;
+
+    //    std::cout << "Now Node:" << std::endl;
+    //    std::cout << i <<" " <<  dis(G.Nodes[i] -> vec,G.Nodes[i] -> vec) << std::endl;
+
+    }
+    stop = time(NULL);
+
+    float recall = 1.0 * correct / testnum / K;
+    std::cout << "Recall@" << K << " is " << recall << "." << std::endl;
+    std::cout << "Handling " << testnum << " queries needs " << stop - start << "seconds " << std::endl;
+
+    std::cout << "End of testing the TOGG search by using gist" << std::endl;
+    delete alg;
+    
+
+
 }
 
 
@@ -281,6 +386,7 @@ int main(){
 //    test_Get_Linklists();
 //    test_Get_Graph();
 //    test_OGS_KDT_Routing();
-    test_Greedy_Search();
+//    test_Greedy_Search();
+    test_TOGG();
     return 0;
 }

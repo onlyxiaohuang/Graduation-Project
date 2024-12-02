@@ -80,7 +80,7 @@ __type dis(const std::vector<__type> &x,const std::vector<__type> &y){
     __type ret = 0;
     assert(x.size() == y.size());
     for(int i = 0;i < x.size();i ++){
-        ret += x[i] * y[i];
+        ret += (x[i] - y[i]) * (x[i] - y[i]);
     }
     return ret;
 }

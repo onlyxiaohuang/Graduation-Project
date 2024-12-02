@@ -9,11 +9,11 @@ hnswlib::HierarchicalNSW<__type>* alg_hnsw = NULL;
 hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G, int N,int Dim = dim,int ef_construction = 200,int neighbor_size = 516){
     //build graph by HNSW
     // Initializing index, and __type here only for "float"
-    hnswlib::L2Space space(Dim);
-    alg_hnsw = new hnswlib::HierarchicalNSW<__type>(&space, N, neighbor_size ,ef_construction);
+    hnswlib::L2Space* space = new hnswlib::L2Space(Dim);
+    alg_hnsw = new hnswlib::HierarchicalNSW<__type>(space, N, neighbor_size ,ef_construction);
     
     //std::cout << debug << std::endl;
-    std::cout << 1 <<std::endl;
+    std::cout << N << "dim:" << Dim <<std::endl;
     //Add data to index
     for(int i = 0;i < N;i ++){
         alg_hnsw -> addPoint((void*)&(G.Nodes[i]->vec[0]),i);
@@ -22,15 +22,13 @@ hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G, int N,int Dim = dim
     if(debug == 1){
         std::cout << "Start testing, address of alg_hnsw is .."  << std::endl; 
         std::cout << alg_hnsw << std::endl;
-        //std::cout << N << std::endl;
-    }
-    std::cout << 2 << std::endl;
-    // Query the elements for themselves and measure recall
+        //std::cout << N << std::endl;    
     float correct = 0;
     for (int i = 0; i < N; i++) {
         std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg_hnsw->searchKnn((void*)&(G.Nodes[i]->vec[0]), 1);
         hnswlib::labeltype label = result.top().second;
         if (label == i) correct++;
+        std::cout << "label is " << label << std::endl;
 
         //if(debug == 1){
         //    std::cout << G.Nodes[i]->vec[0] << std::endl;
@@ -39,10 +37,17 @@ hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G, int N,int Dim = dim
     }
     float recall = correct / N;
     std::cout << "Recall: " << recall << "\n";
+    }
+    std::cout << 2 << std::endl;
+    // Query the elements for themselves and measure recall
+
     
     //Serialize index
     std::string hnsw_path = "./output/hnsw.bin";
     alg_hnsw->saveIndex(hnsw_path);
+    std::cout << alg_hnsw << std::endl;
+    
+/*
     delete alg_hnsw;
 
 
@@ -62,7 +67,7 @@ hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G, int N,int Dim = dim
     }
     recall = (float)correct / N;
     std::cout << "Recall of deserialized index: " << recall << "\n";
-    
+    */
     return alg_hnsw;
 }
 

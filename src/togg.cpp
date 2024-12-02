@@ -150,7 +150,48 @@ std::vector<Node *> OGA_routing(Graph &G,std::vector <Node *> C,Node *q,int l){
         if(i >= l)  break;
         Visited.insert(C[i]);
         
+        auto &tt = C[i];
+        for(auto n: tt->tonode){
+            if(Visited.find(n.get()) != Visited.end()){
+                if( dis(n->vec, q->vec) <= range ){
+                    C.push_back(n.get());
+                }
+            }
+            else{
+                //detect covergence path
+                auto h = n;
+                while(true){
+                    auto x = h;
+                    for(auto hn: h->tonode){
+                        if( dis(hn -> vec,q -> vec) < dis( x -> vec , q -> vec) ){
+                            x = hn;
+                        }
+                    }
 
+                    if(dis(x -> vec,q -> vec) < dis(h -> vec,q -> vec)){
+                        h = x;
+                    }
+                    else{
+                        break;
+                    }
+
+                }
+                if(dis(h -> vec,q -> vec) <= range){
+                    C.push_back(h.get());
+                }
+            }
+        }
+        sort(C.begin(),C.end(),[&q](Node *x,Node *y){
+            return dis(x -> vec,q -> vec) < dis(y -> vec,q -> vec);
+        });
+        
+        auto ed = std::unique(C.begin(),C.end());
+        C.erase(ed,C.end());
+
+        if(C.size() > L){
+            C.resize(L);
+        }
     }
     
+    return C;
 }
