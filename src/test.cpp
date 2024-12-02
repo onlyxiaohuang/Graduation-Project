@@ -299,14 +299,15 @@ void test_Greedy_Search(){
 extern std::vector<Node *> OGS_KDT_Routing(Graph &G,Node *p,Node *q,int l);
 extern std::vector<Node *> OGA_routing(Graph &G,std::vector <Node *> C,Node *q,int l);
 
-void test_TOGG(int testnum = 10,int K = 10){
+void test_TOGG(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
+    std::fstream out("./logs/TOGG.log",std::ofstream::app);
     time_t start,stop;
 
     std::cout << "Start testing the TOGG search by using gist" << std::endl;
-    test_load_data_sift();
+    test_load_data_gist();
     
     std::cout << "Start getting the HNSW Graph" << std::endl;
-    alg = build_graph_HNSW(G,sift_base,sift_dim);
+    alg = build_graph_HNSW(G,gist_base,gist_dim,ef,nb);
     std::cout << alg << std::endl;
 
     int correct = 0;
@@ -369,12 +370,17 @@ void test_TOGG(int testnum = 10,int K = 10){
 
     float recall = 1.0 * correct / testnum / K;
     std::cout << "Recall@" << K << " is " << recall << "." << std::endl;
-    std::cout << "Handling " << testnum << " queries needs " << stop - start << "seconds " << std::endl;
+    std::cout << "Handling " << testnum << " queries needs " << stop - start << " seconds " << std::endl;
+
+    out << "Nowtime is " << stop << "." << std::endl;
+
+    out << "testnum = " << testnum << ", K =" << K << "." << std::endl;
+    out << "" << std::endl;
+    out << "Recall@K = " << recall << ". Time: " << time << " " << std::endl; 
 
     std::cout << "End of testing the TOGG search by using gist" << std::endl;
     delete alg;
-    
-
+    out.close();
 
 }
 
