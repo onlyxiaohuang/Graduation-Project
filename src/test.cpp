@@ -304,10 +304,10 @@ void test_TOGG(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     time_t start,stop;
 
     std::cout << "Start testing the TOGG search by using gist" << std::endl;
-    test_load_data_gist();
+    test_load_data_sift();
     
     std::cout << "Start getting the HNSW Graph" << std::endl;
-    alg = build_graph_HNSW(G,gist_base,gist_dim,ef,nb);
+    alg = build_graph_HNSW(G,sift_base,sift_dim,ef,nb);
     std::cout << alg << std::endl;
 
     int correct = 0;
@@ -376,7 +376,7 @@ void test_TOGG(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
 
     out << "testnum = " << testnum << ", K =" << K << "." << std::endl;
     out << "" << std::endl;
-    out << "Recall@K = " << recall << ". Time: " << time << " " << std::endl; 
+    out << "Recall@K = " << recall << ". Time: " << time << ". Time per test is " << 1.0 * (stop - start) / testnum << "." << std::endl; 
 
     std::cout << "End of testing the TOGG search by using gist" << std::endl;
     delete alg;
@@ -393,6 +393,6 @@ int main(){
 //    test_Get_Graph();
 //    test_OGS_KDT_Routing();
 //    test_Greedy_Search();
-    test_TOGG();
+    test_TOGG(sift_base,10,200,8);
     return 0;
 }
