@@ -10,7 +10,7 @@ FILE=./sift/gist.tar.gz
 #fi
 mkdir test
 if [ ! -f "./test/sift.tar.gz" ]; then
-    curl ftp://ftp.irisa.fr/local/texmex/corpus/siftsmall.tar.gz --output ./test/sift.tar.gz
+    curl ftp://ftp.irisa.fr/local/texmex/corpus/siftsmall.tar.gz --output ./test/sift.tar.gz -C -
 fi
 
 

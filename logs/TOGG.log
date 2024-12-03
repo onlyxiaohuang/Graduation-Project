@@ -6,3 +6,17 @@ Nowtime is 1733127629.
 testnum = 10, K =10.
 
 Recall@K = 0.82. Time: 1 
+Nowtime is 1733207248.
+testnum = 10, K =10.
+
+Recall@K = 0.36. Time: 1. Time per test is 632.2.
+Nowtime is 1733207888.
+Use sift_10000, neighborsize = 8 , ef_construction = 200.
+testnum = 10, K =10.
+
+Recall@K = 0.82. Time: 2. Time per test is 0.
+Nowtime is 1733207910.
+Use sift_10000, neighborsize = 16 , ef_construction = 200.
+testnum = 10, K =10.
+
+Recall@K = 0.97. Time: 2. Time per test is 0.1.
