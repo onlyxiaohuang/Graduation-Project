@@ -102,20 +102,11 @@ std::vector<const Node*> Greedy_Graph_Search(Node* q,Node* p,int efs){ //FINGER 
     while(!C.empty()){
 
         auto it = C.begin();
-        while(C.size()){
-            if(V.find((Node *) *it) != V.end()){
-                it = C.erase(it);
-            }
-            else break;
-        }
-
-        if(C.size() == 0){
-            break;
-        }
+        C.erase(*it);
 
         auto cur = *it;
         V.insert((Node *)cur);
-        std::cout << cur << std::endl;
+//        std::cout << cur << std::endl;
         if(debug == 1){
             std::cout << &cur << std::endl;
             std::cout << T.size() << std::endl;
@@ -135,8 +126,9 @@ std::vector<const Node*> Greedy_Graph_Search(Node* q,Node* p,int efs){ //FINGER 
 
             V.insert(n.get());
 
-            if(dis(n->vec,q->vec) - eps <= dist + eps || T.size() <= efs){
+            if(dis(n->vec,q->vec) <= dist || T.size() <= efs){
                 T.insert(n.get());
+                C.insert(n.get());
                 if(T.size() > efs){
                     T.erase(T.begin());
                 }
