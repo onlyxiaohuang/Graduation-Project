@@ -59,6 +59,12 @@ struct Node
     //the neighbors of the Node
     std::vector< std::shared_ptr< Node> > tonode;
 
+    //@FINGER
+    //the P * dres in the neighborhood
+    std::vector< Eigen::VectorXf > Pdres;
+    Eigen::VectorXf Pqres;
+    __type nowdistoq = 0;
+
 };
 
 struct Graph

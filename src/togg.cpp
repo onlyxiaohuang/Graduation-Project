@@ -188,8 +188,8 @@ std::vector<Node *> OGA_routing(Graph &G,std::vector <Node *> C,Node *q,int l){
         auto ed = std::unique(C.begin(),C.end());
         C.erase(ed,C.end());
 
-        if(C.size() > L){
-            C.resize(L);
+        if(C.size() > l){
+            C.resize(l);
         }
     }
     
@@ -294,6 +294,47 @@ std::tuple<MatrixXf, __type, __type, __type, __type,__type> computeParameters(
     return {P, mu_x, sigma_x, mu_y, sigma_y, epsilon};
 }
 
+
+//precalculate
+//O(n * d * dim^2 * r)
+std::vector<__type> Dis;
+void finger_precalculate(Graph &G,std::tuple<MatrixXf,__type,__type,__type,__type,__type> res,Node *Q){
+
+    //calculate ||d||^2
+    Dis.resize(G.Nodes.size());
+    for(auto node:G.Nodes){
+        Dis[node->index] = 0;
+        for(auto tt:node -> vec){
+            Dis[node -> index] += tt * tt;
+        }
+    }
+
+    //calculate Pdres and Pqres
+
+    VectorXf c,d,q,dres,qres;
+    q = Map<VectorXf,Unaligned>((__type *)Q -> vec.data(),Q -> vec.size());
+    for(auto node:G.Nodes){
+        c = Map<VectorXf,Unaligned>((__type *)node -> vec.data(),node -> vec.size());
+        
+        //get qres
+        qres = q - 1.0 * (c.dot(q)) / (c.dot(c)) * c; 
+        node -> Pqres = std::get<0>(res) * q;
+
+        node -> Pdres.resize(node -> tonode.size());
+        for(int i = 0; i < node -> tonode.size();i ++){
+            d = Map<VectorXf,Unaligned>((__type *) node->tonode[i]->vec.data(),node->tonode[i]->vec.size());
+            
+            //get dres
+            dres = d - 1.0 * c.dot(d) / c.dot(c) * c;
+
+
+            node -> Pdres[i] = std::get<0>(res) * d;
+
+        }
+    }
+    std::cout << "Precalculated over" << std::endl;
+}
+
 //FINGER Algorithm-3
 __type approximate_distance(const Node *Q,const Node *C,const Node *D,std::tuple<MatrixXf,__type,__type,__type,__type,__type> par){
   //  std::cout << "begin" << std::endl;
@@ -339,6 +380,9 @@ std::vector<Node *> OGS_KDT_Routing_test1(Graph &G,Node *p,Node *q,int l){
     std::set<const Node*, decltype(cmp)> C(cmp),Visited(cmp);//candidate set
     C.insert(p);
     //std::unordered_set <Node*> Visited;//visited set
+
+
+
 
     //
     auto it = C.begin();
@@ -402,10 +446,11 @@ std::vector<Node *> OGS_KDT_Routing_test1(Graph &G,Node *p,Node *q,int l){
 
 const int test_case = 1000,r = 30;
 
-//TOGG algorithm 5-test1
+//TOGG algorithm 5-test1 by using FINGER
+//O(n * logn * d^2 * dim)
 std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,int l){
     auto cmp = [&q](const Node *a,const Node *b) -> bool{
-        return dis(a->vec,q->vec) < dis(b->vec,q->vec);
+        return a->index < b->index;
     };//the increasing order
 
 
@@ -416,8 +461,21 @@ std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,in
     const std::tuple<MatrixXf,__type,__type,__type,__type,__type> res = computeParameters(Nodes,r);
 
 
+    finger_precalculate(G,res,q);
+
+    //low rank calculation
+    auto finger_dis = [&res](VectorXf &Pqres,VectorXf &Pdres){
+        //std::cout << "finger_dis begins. "<< std::endl;
+        auto hatt = cosineSimilarity(Pqres,Pdres);
+        
+        //std::cout << "finger_dis ends."<< std::endl;
+        return (hatt - std::get<3>(res)) * std::get<2>(res) / std::get<4>(res) + std::get<1>(res) + std::get<5>(res);
+        
+    };
+
     std::set<const Node*, decltype(cmp)> Visited(cmp);
     __type range = dis((*C.rbegin())->vec,q->vec);
+    
 
     int i = 0;
     while(i < l){
@@ -428,38 +486,47 @@ std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,in
         }
         if(i >= l)  break;
         Visited.insert(C[i]);
+
         
         auto tt = C[i];
-        
-//        std::cout <<"*" << tt  << std::endl;
-        for(auto n: tt->tonode){
-//            std::cout << 1 << std::endl;
+        //set nowdistoq
+    
+        tt -> nowdistoq = dis(tt->vec,q->vec);
+
+        std::cout <<"*" << tt  << std::endl;
+        for(int i = 0;i < tt -> tonode.size();i ++){
+            auto n = tt -> tonode[i];
+ //           std::cout << 1 << std::endl;
  //           std::cout <<"*" << tt  << std::endl;
-            __type nowdis = approximate_distance(q,tt,n.get(),res);
+            __type ndis = finger_dis(tt -> Pqres,tt -> Pdres[i]);
  //           std::cout << "*" << n.get() << std::endl;
 
             if(Visited.find(n.get()) != Visited.end()){
-                if( nowdis <= range ){
+                if( ndis <= range ){
                     C.push_back(n.get());
+                    n ->nowdistoq = ndis;
                 }
             }
             else{
                 //detect covergence path
                 auto h = n.get();
+                __type hdis = ndis;
 
                 while(true){
-                    auto x = h;
-                    for(auto hn: h->tonode){
-
-                       // std::cout << 2 << std::endl;
-                        if( approximate_distance (q ,h,hn.get(),res) < approximate_distance (q ,h,x,res) ){
-                            x = hn.get();
+                    std::cout << "*" << h << std::endl;
+                    int x = 0;
+                    for(int j = 0;j < h -> tonode.size();j ++){
+                        auto hn = h -> tonode[j];
+                        //std::cout << 2 << std::endl;
+                        if( finger_dis (h -> Pqres,h -> Pdres[j]) < finger_dis (h -> Pqres,h -> Pdres[x]) ){
+                            x = j;
                         }
                     }
 
                     //std::cout << 3 << std::endl;
-                    if(approximate_distance (q ,h,x,res) < nowdis){
-                        h = x;
+                    if(finger_dis (h -> Pqres,h -> Pdres[x]) < hdis){
+                        hdis = finger_dis (h -> Pqres,h -> Pdres[x]);
+                        h = h -> tonode[x].get();
                     }
                     else{
                         break;
@@ -467,23 +534,24 @@ std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,in
 
                 }
                 //std::cout << 4 << std::endl;
-                if(approximate_distance (q ,n.get(),h,res) <= range){
+                if(hdis <= range){
                     C.push_back(h);
+                    h ->nowdistoq = hdis;
                 }
             }
         }
         sort(C.begin(),C.end(),[&q](Node *x,Node *y){
-            return dis(x -> vec,q -> vec) < dis(y -> vec,q -> vec);
+            return dis(x -> vec,q -> vec) < dis(y -> vec,q -> vec);//x -> nowdistoq < y -> nowdistoq;
         });
         
         auto ed = std::unique(C.begin(),C.end());
         C.erase(ed,C.end());
 
-        if(C.size() > L){
-            C.resize(L);
+        if(C.size() > l){
+            C.resize(l);
         }
     }
-    
+
     return C;
 }
 

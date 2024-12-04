@@ -679,6 +679,7 @@ int main(){
 //    test_Greedy_Search(10,10,200,16);
 //    test_TOGG_gist(10,10,200,16);
 //    test_TOGG_sift(10,10,200,16);
-    test_TOGG_FINGER_gist(10,10,200,64);
+    test_TOGG_FINGER_gist(10,10,200,16);
+//    test_TOGG_FINGER_sift(10,10,200,16);
     return 0;
 }
