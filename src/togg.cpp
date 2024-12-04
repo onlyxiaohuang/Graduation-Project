@@ -215,41 +215,52 @@ std::vector<__type> res (std::vector<__type> &x, std::vector<__type> &y){
 
 using namespace Eigen;
 //n是结果矩阵的大小，也就是p.size() * ( p.size() - 1 ) / 2double cosineSimilarity(const VectorXd& a, const VectorXd& b) {
-double cosineSimilarity(const VectorXd& a, const VectorXd& b) {
+double cosineSimilarity(const VectorXf& a, const VectorXf& b) {
     return a.dot(b) / (a.norm() * b.norm());
 }
 
 //FINGER Algorithm-2
 // 方法实现
-std::tuple<MatrixXd, __type, __type, __type, __type,__type> computeParameters(
+std::tuple<MatrixXf, __type, __type, __type, __type,__type> computeParameters(
     std::vector <std::shared_ptr <Node> > v, int r) {
-    std::vector<VectorXd> D_res;
-    std::vector<std::pair<VectorXd, VectorXd>> S;
+    std::vector<VectorXf> D_res;
+    std::vector<std::pair<VectorXf, VectorXf>> S;
 
     // Step 1: 遍历节点 c
     for(auto nownode : v) {
         for (int c = 0; c < nownode -> tonode.size();c ++) {
             for (int d = c + 1; d < nownode -> tonode.size();d ++) {
-                S.emplace_back(nownode -> tonode[c] -> vec,nownode -> tonode[d] -> vec);
+                VectorXf fir = Map<VectorXf,Unaligned>((__type *)nownode -> tonode[c] -> vec.data(),nownode -> tonode[c] -> vec.size());
+                VectorXf sec = Map<VectorXf,Unaligned>((__type *)nownode -> tonode[d] -> vec.data(),nownode -> tonode[d] -> vec.size());
+                S.emplace_back(fir,sec);
             }
         }
     }
 
+    //std::cout << "Step 2" << std::endl;
     // Step 2: 计算 D_res
     for (const auto& pair : S) {
         D_res.push_back(pair.first - pair.second);
     }
 
+    //std::cout << "Step 3" << std::endl;
     // Step 3: 计算 SVD
-    MatrixXd D_res_matrix(D_res.size(), r);
+    MatrixXf matrix(D_res[0].size(), D_res.size());
     for (size_t i = 0; i < D_res.size(); ++i) {
-        D_res_matrix.row(i) = D_res[i].transpose();
+        for (size_t j = 0; j < D_res[i].size(); ++j) {
+            matrix(j, i) = D_res[i][j];
+        }
     }
-    JacobiSVD<MatrixXd> svd(D_res_matrix, ComputeThinU | ComputeThinV);
-    MatrixXd U = svd.matrixU();
-    MatrixXd V = svd.matrixV();
-    MatrixXd P = U.leftCols(r).transpose();
+    
+    
+    //std::cout << "Step 31" << std::endl;
+    JacobiSVD<MatrixXf> svd(matrix, ComputeThinU | ComputeThinV);
+    MatrixXf U = svd.matrixU();//U是一个边长为dim的矩阵
+    MatrixXf V = svd.matrixV();
 
+    MatrixXf P = U.leftCols(r).transpose();
+
+    //std::cout << "Step 4" << std::endl;
     // Step 4: 计算 X 和 Y
     std::vector<__type> X, Y;
     for (const auto& pair : S) {
@@ -257,6 +268,7 @@ std::tuple<MatrixXd, __type, __type, __type, __type,__type> computeParameters(
         Y.push_back(cosineSimilarity(P * pair.first, P * pair.second));
     }
 
+    //std::cout << "Step 5" << std::endl;
     // Step 5: 计算分布参数
     __type mu_x,sigma_x,mu_y,sigma_y;
     size_t N = X.size();
@@ -269,6 +281,7 @@ std::tuple<MatrixXd, __type, __type, __type, __type,__type> computeParameters(
         return sum + (y - mu_y) * (y - mu_y);
     }) / N);
 
+    //std::cout << "Step 6" << std::endl;
     // Step 6: 计算误差 epsilon
     __type epsilon = 0.0;
     for (size_t i = 0; i < N; ++i) {
@@ -276,14 +289,32 @@ std::tuple<MatrixXd, __type, __type, __type, __type,__type> computeParameters(
     }
     epsilon /= N;
 
+    //std::cout << "End" << std::endl;
+    //std::cout << P << " " << mu_x << " " << sigma_x <<" " << mu_y << " " << sigma_y << " " << epsilon << std::endl;
     return {P, mu_x, sigma_x, mu_y, sigma_y, epsilon};
 }
 
 //FINGER Algorithm-3
-__type approximate_distance(const Node *Q,const Node *C,std::tuple<MatrixXd,__type,__type,__type,__type,__type> par){
-    VectorXd q(Q -> vec),c(C -> vec);
-    VectorXd qproj = 1.0 * c.dot(q) / c.dot(c) * c;
+__type approximate_distance(const Node *Q,const Node *C,const Node *D,std::tuple<MatrixXf,__type,__type,__type,__type,__type> par){
+  //  std::cout << "begin" << std::endl;
     
+  //  std::cout << Q << " " << C << " " << D << std::endl;
+    VectorXf q,c,d;
+    q = Map<VectorXf,Unaligned>((__type *)Q -> vec.data(),Q -> vec.size());
+    c = Map<VectorXf,Unaligned>((__type *)C -> vec.data(),C -> vec.size());
+    d = Map<VectorXf,Unaligned>((__type *)D -> vec.data(),D -> vec.size());
+
+    //std::cout << c << std::endl;
+
+    VectorXf qproj = 1.0 * c.dot(q) / c.dot(c) * c;
+    VectorXf qres = q - qproj;
+    VectorXf dproj = 1.0 * c.dot(d) / c.dot(c) * c;
+    VectorXf dres = d - dproj;
+
+    auto hatt = cosineSimilarity(std::get<0>(par) * qres, std::get<0>(par) * dres);
+    auto t = (hatt - std::get<3>(par)) * std::get<2>(par) / std::get<4>(par) + std::get<1>(par) + std::get<5>(par);
+  //  std::cout << "end" << std::endl;
+    return t;
 }
 
 
@@ -368,14 +399,24 @@ std::vector<Node *> OGS_KDT_Routing_test1(Graph &G,Node *p,Node *q,int l){
 //    std::cout << "finished" << std::endl;
     return ret;
 }
+
+const int test_case = 1000,r = 30;
+
 //TOGG algorithm 5-test1
 std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,int l){
     auto cmp = [&q](const Node *a,const Node *b) -> bool{
         return dis(a->vec,q->vec) < dis(b->vec,q->vec);
     };//the increasing order
 
-    std::set<const Node*, decltype(cmp)> Visited(cmp);
 
+    std::vector<std::shared_ptr<Node> > Nodes;
+    for(int i = 0 ;i < test_case ;i ++){
+        Nodes.push_back(G.Nodes[i]);
+    }
+    const std::tuple<MatrixXf,__type,__type,__type,__type,__type> res = computeParameters(Nodes,r);
+
+
+    std::set<const Node*, decltype(cmp)> Visited(cmp);
     __type range = dis((*C.rbegin())->vec,q->vec);
 
     int i = 0;
@@ -388,25 +429,36 @@ std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,in
         if(i >= l)  break;
         Visited.insert(C[i]);
         
-        auto &tt = C[i];
+        auto tt = C[i];
+        
+//        std::cout <<"*" << tt  << std::endl;
         for(auto n: tt->tonode){
+//            std::cout << 1 << std::endl;
+ //           std::cout <<"*" << tt  << std::endl;
+            __type nowdis = approximate_distance(q,tt,n.get(),res);
+ //           std::cout << "*" << n.get() << std::endl;
+
             if(Visited.find(n.get()) != Visited.end()){
-                if( dis(n->vec, q->vec) <= range ){
+                if( nowdis <= range ){
                     C.push_back(n.get());
                 }
             }
             else{
                 //detect covergence path
-                auto h = n;
+                auto h = n.get();
+
                 while(true){
                     auto x = h;
                     for(auto hn: h->tonode){
-                        if( dis(hn -> vec,q -> vec) < dis( x -> vec , q -> vec) ){
-                            x = hn;
+
+                       // std::cout << 2 << std::endl;
+                        if( approximate_distance (q ,h,hn.get(),res) < approximate_distance (q ,h,x,res) ){
+                            x = hn.get();
                         }
                     }
 
-                    if(dis(x -> vec,q -> vec) < dis(h -> vec,q -> vec)){
+                    //std::cout << 3 << std::endl;
+                    if(approximate_distance (q ,h,x,res) < nowdis){
                         h = x;
                     }
                     else{
@@ -414,8 +466,9 @@ std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,in
                     }
 
                 }
-                if(dis(h -> vec,q -> vec) <= range){
-                    C.push_back(h.get());
+                //std::cout << 4 << std::endl;
+                if(approximate_distance (q ,n.get(),h,res) <= range){
+                    C.push_back(h);
                 }
             }
         }
