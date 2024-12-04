@@ -11,6 +11,9 @@
 #include <algorithm>
 #include <memory>
 
+//eigen
+#include "./libs/eigen/Eigen/SVD"
+
 // debug
 #ifndef DEBUG
 const int debug = 0;

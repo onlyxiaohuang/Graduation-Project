@@ -1,3 +1,6 @@
 [submodule "src/libs/hnswlib"]
 	path = src/libs/hnswlib
 	url = https://github.com/nmslib/hnswlib.git
+[submodule "src/libs/eigen"]
+	path = src/libs/eigen
+	url = https://github.com/PX4/eigen.git

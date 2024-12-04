@@ -5,3 +5,4 @@ struct NeighborTree{
     std::vector <Node *> left,right,common;
     int dim = 0;
 };
+

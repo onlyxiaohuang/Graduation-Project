@@ -229,6 +229,9 @@ void test_load_data_gist(){
 
 extern std::vector<const Node*> Greedy_Graph_Search(Node* q,Node* p,int efs);
 void test_Greedy_Search(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
+    std::fstream out("./logs/Greedy_Search.log",std::ofstream::app);
+    time_t start,stop,usedtime = 0;
+
     std::cout << "Start testing the greedy search by using sift" << std::endl;
     test_load_data_sift();
     
@@ -263,7 +266,10 @@ void test_Greedy_Search(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
         
         std::set<int> ans;
 
+        start = time(NULL);
         auto testresult = Greedy_Graph_Search(G.Nodes[i].get(),G.Nodes[0].get(),K);
+        stop = time(NULL);
+
         std::cout << "testresult:" << std::endl;
         for(auto tt:testresult){
             ans.insert(tt -> index);
@@ -290,6 +296,14 @@ void test_Greedy_Search(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     }
     float recall = 1.0 * correct / testnum / K;
     std::cout << "Recall@" << K << " is " << recall << "." << std::endl;
+
+    out << "Nowtime is " << stop << "." << std::endl;
+    out << "Use sift_10000, neighborsize = " << nb << " , ef_construction = " << ef << "." << std::endl;
+
+    out << "testnum = " << testnum << ", K =" << K << "." << std::endl;
+    out << "" << std::endl;
+    out << "Recall@K = " << recall << ". Time: " << usedtime << ". Time per test is " << 1.0 * (stop - start) / testnum << "." << std::endl; 
+
 
     std::cout << "End of testing the greedy search by using sift" << std::endl;
     delete alg;
@@ -483,7 +497,9 @@ int main(){
 //    test_Get_Linklists();
 //    test_Get_Graph();
 //    test_OGS_KDT_Routing();
-    test_Greedy_Search(10,10,200,16);
+//    test_Greedy_Search(10,10,200,16);
 //    test_TOGG_gist(10,10,200,16);
+//    test_TOGG_sift(10,10,200,16);
+
     return 0;
 }

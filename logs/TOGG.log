@@ -20,3 +20,18 @@ Use sift_10000, neighborsize = 16 , ef_construction = 200.
 testnum = 10, K =10.
 
 Recall@K = 0.97. Time: 2. Time per test is 0.1.
+Nowtime is 1733209801.
+Use sift_10000, neighborsize = 16 , ef_construction = 200.
+testnum = 10, K =10.
+
+Recall@K = 0.97. Time: 2. Time per test is 0.
+Nowtime is 1733215602.
+Use sift_10000, neighborsize = 16 , ef_construction = 200.
+testnum = 10, K =10.
+
+Recall@K = 0.41. Time: 5009. Time per test is 65.7.
+Nowtime is 1733216323.
+Use sift_10000, neighborsize = 16 , ef_construction = 200.
+testnum = 10, K =10.
+
+Recall@K = 0.41. Time: 4832. Time per test is 62.9.
