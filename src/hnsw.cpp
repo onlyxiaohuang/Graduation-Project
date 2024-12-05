@@ -23,6 +23,7 @@ hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G, int N,int Dim = dim
         std::cout << "Start testing, address of alg_hnsw is .."  << std::endl; 
         std::cout << alg_hnsw << std::endl;
         //std::cout << N << std::endl;    
+    }
     float correct = 0;
     for (int i = 0; i < N; i++) {
         std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg_hnsw->searchKnn((void*)&(G.Nodes[i]->vec[0]), 1);
@@ -37,7 +38,7 @@ hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G, int N,int Dim = dim
     }
     float recall = correct / N;
     std::cout << "Recall: " << recall << "\n";
-    }
+    
     std::cout << 2 << std::endl;
     // Query the elements for themselves and measure recall
 

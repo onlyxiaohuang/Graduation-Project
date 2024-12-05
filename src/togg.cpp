@@ -150,7 +150,7 @@ std::vector<Node *> OGA_routing(Graph &G,std::vector <Node *> C,Node *q,int l){
         if(i >= l)  break;
         Visited.insert(C[i]);
         
-        auto &tt = C[i];
+        auto tt = C[i];
         for(auto n: tt->tonode){
             if(Visited.find(n.get()) != Visited.end()){
                 if( dis(n->vec, q->vec) <= range ){
@@ -221,8 +221,7 @@ double cosineSimilarity(const VectorXf& a, const VectorXf& b) {
 
 //FINGER Algorithm-2
 // 方法实现
-std::tuple<MatrixXf, __type, __type, __type, __type,__type> computeParameters(
-    std::vector <std::shared_ptr <Node> > v, int r) {
+std::tuple<MatrixXf, __type, __type, __type, __type,__type> computeParameters(std::vector <std::shared_ptr <Node> > v, int r) {
     std::vector<VectorXf> D_res;
     std::vector<std::pair<VectorXf, VectorXf>> S;
 
@@ -295,10 +294,10 @@ std::tuple<MatrixXf, __type, __type, __type, __type,__type> computeParameters(
 }
 
 
-//precalculate
-//O(n * d * dim^2 * r)
+//precalculate after Graph G is built
+//O(dim * n * d) d is the size of neighbors
 std::vector<__type> Dis;
-void finger_precalculate(Graph &G,std::tuple<MatrixXf,__type,__type,__type,__type,__type> res,Node *Q){
+void finger_precalculate_1(Graph &G,std::tuple<MatrixXf,__type,__type,__type,__type,__type> res){
 
     //calculate ||d||^2
     Dis.resize(G.Nodes.size());
@@ -309,17 +308,11 @@ void finger_precalculate(Graph &G,std::tuple<MatrixXf,__type,__type,__type,__typ
         }
     }
 
-    //calculate Pdres and Pqres
+    //calculate Pdres 
 
     VectorXf c,d,q,dres,qres;
-    q = Map<VectorXf,Unaligned>((__type *)Q -> vec.data(),Q -> vec.size());
     for(auto node:G.Nodes){
         c = Map<VectorXf,Unaligned>((__type *)node -> vec.data(),node -> vec.size());
-        
-        //get qres
-        qres = q - 1.0 * (c.dot(q)) / (c.dot(c)) * c; 
-        node -> Pqres = std::get<0>(res) * q;
-
         node -> Pdres.resize(node -> tonode.size());
         for(int i = 0; i < node -> tonode.size();i ++){
             d = Map<VectorXf,Unaligned>((__type *) node->tonode[i]->vec.data(),node->tonode[i]->vec.size());
@@ -333,6 +326,18 @@ void finger_precalculate(Graph &G,std::tuple<MatrixXf,__type,__type,__type,__typ
         }
     }
     std::cout << "Precalculated over" << std::endl;
+}
+
+void finger_precalculate_2(Graph G,std::tuple<MatrixXf,__type,__type,__type,__type,__type> res,Node *Q){
+    VectorXf c,d,q,dres,qres;
+    q = Map<VectorXf,Unaligned>((__type *)Q -> vec.data(),Q -> vec.size());
+    for(auto node:G.Nodes){
+        c = Map<VectorXf,Unaligned>((__type *)node -> vec.data(),node -> vec.size());
+        
+        //get qres
+        qres = q - 1.0 * (c.dot(q)) / (c.dot(c)) * c; 
+        node -> Pqres = std::get<0>(res) * q;
+    }
 }
 
 //FINGER Algorithm-3
@@ -444,24 +449,18 @@ std::vector<Node *> OGS_KDT_Routing_test1(Graph &G,Node *p,Node *q,int l){
     return ret;
 }
 
-const int test_case = 1000,r = 30;
+
 
 //TOGG algorithm 5-test1 by using FINGER
 //O(n * logn * d^2 * dim)
-std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,int l){
+std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,int l,std::tuple<MatrixXf,__type,__type,__type,__type,__type> res){
     auto cmp = [&q](const Node *a,const Node *b) -> bool{
         return a->index < b->index;
     };//the increasing order
 
 
-    std::vector<std::shared_ptr<Node> > Nodes;
-    for(int i = 0 ;i < test_case ;i ++){
-        Nodes.push_back(G.Nodes[i]);
-    }
-    const std::tuple<MatrixXf,__type,__type,__type,__type,__type> res = computeParameters(Nodes,r);
 
-
-    finger_precalculate(G,res,q);
+    finger_precalculate_2(G,res,q);
 
     //low rank calculation
     auto finger_dis = [&res](VectorXf &Pqres,VectorXf &Pdres){
@@ -493,7 +492,7 @@ std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,in
     
         tt -> nowdistoq = dis(tt->vec,q->vec);
 
-        std::cout <<"*" << tt  << std::endl;
+        //std::cout <<"*" << tt  << std::endl;
         for(int i = 0;i < tt -> tonode.size();i ++){
             auto n = tt -> tonode[i];
  //           std::cout << 1 << std::endl;
@@ -513,7 +512,7 @@ std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,in
                 __type hdis = ndis;
 
                 while(true){
-                    std::cout << "*" << h << std::endl;
+                    //std::cout << "*" << h << std::endl;
                     int x = 0;
                     for(int j = 0;j < h -> tonode.size();j ++){
                         auto hn = h -> tonode[j];

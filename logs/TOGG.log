@@ -45,3 +45,8 @@ Use sift_10000, neighborsize = 16 , ef_construction = 200.
 testnum = 10, K =10.
 
 Recall@K = 0.97. Time: 174. Time per test is 1.8.
+Nowtime is 1733378501.
+Use gist_1M, neighborsize = 16 , ef_construction = 200.
+testnum = 10, K =10.
+
+Recall@K = 0.39. Time: 5942. Time per test is 78.4.

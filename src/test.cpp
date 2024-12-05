@@ -345,7 +345,7 @@ void test_TOGG_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     //recall@K
     for(int i = 0;i < testnum;i ++){
 
-        std::cout << "*" << i << std::endl;
+        std::cout << "*" << i  << " *" << G.Nodes[i]->index << std::endl;
         std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg->searchKnn((void*)&(G.Nodes[i]->vec[0]), K);
         
         std::set<int> ans;
@@ -368,7 +368,7 @@ void test_TOGG_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
 
         std::cout << "Ansresult:" << std::endl;
         int dd = K;
-        while(dd--){
+        while(!result.empty()){
             auto now = result.top(); result.pop();
             std::cout << now.second << " ";
             std::cout << "dis:" << dis(G.Nodes[now.second] -> vec,G.Nodes[i]->vec) << " ";
@@ -386,13 +386,13 @@ void test_TOGG_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     float recall = 1.0 * correct / testnum / K;
     std::cout << "Recall@" << K << " is " << recall << "." << std::endl;
     std::cout << "Handling " << testnum << " queries needs " << usedtime << " seconds " << std::endl;
-
+    out << "" << std::endl;
     out << "Nowtime is " << stop << "." << std::endl;
-    out << "Use sift_10000, neighborsize = " << nb << " , ef_construction = " << ef << "." << std::endl;
+    out << "Use gist_1M, neighborsize = " << nb << " , ef_construction = " << ef << "." << std::endl;
 
     out << "testnum = " << testnum << ", K =" << K << "." << std::endl;
-    out << "" << std::endl;
-    out << "Recall@K = " << recall << ". Time: " << usedtime << ". Time per test is " << 1.0 * (stop - start) / testnum << "." << std::endl; 
+   
+    out << "Recall@K = " << recall << ". Time: " << usedtime << "s. Time per test is " << 1.0 * (stop - start) / testnum << "s." << std::endl; 
 
     std::cout << "End of testing the TOGG search by using gist" << std::endl;
     delete alg;
@@ -457,7 +457,7 @@ void test_TOGG_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
 
         std::cout << "Ansresult:" << std::endl;
         int dd = K;
-        while(dd--){
+        while(!result.empty()){
             auto now = result.top(); result.pop();
             std::cout << now.second << " ";
             std::cout << "dis:" << dis(G.Nodes[now.second] -> vec,G.Nodes[i]->vec) << " ";
@@ -473,24 +473,36 @@ void test_TOGG_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     }
 
     float recall = 1.0 * correct / testnum / K;
+    
     std::cout << "Recall@" << K << " is " << recall << "." << std::endl;
     std::cout << "Handling " << testnum << " queries needs " << usedtime << " seconds " << std::endl;
+
+    out << "" << std::endl;
 
     out << "Nowtime is " << stop << "." << std::endl;
     out << "Use sift_10000, neighborsize = " << nb << " , ef_construction = " << ef << "." << std::endl;
 
     out << "testnum = " << testnum << ", K =" << K << "." << std::endl;
-    out << "" << std::endl;
-    out << "Recall@K = " << recall << ". Time: " << usedtime << ". Time per test is " << 1.0 * (stop - start) / testnum << "." << std::endl; 
+    
+    out << "Recall@K = " << recall << ". Time: " << usedtime << "s. Time per test is " << 1.0 * (stop - start) / testnum << "s." << std::endl; 
 
-    std::cout << "End of testing the TOGG search by using gist" << std::endl;
+    std::cout << "End of testing the TOGG search by using sift" << std::endl;
     delete alg;
     out.close();
 
 }
 
 extern std::vector<Node *> OGS_KDT_Routing_test1(Graph &G,Node *p,Node *q,int l);
-extern std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,int l);
+extern std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,int l,std::tuple<Eigen::MatrixXf,__type,__type,__type,__type,__type> res);
+
+//Compute parameters
+extern std::tuple<Eigen::MatrixXf, __type, __type, __type, __type,__type> computeParameters(
+    std::vector <std::shared_ptr <Node> > v, int r);
+extern void finger_precalculate_1(Graph &G,std::tuple<Eigen::MatrixXf,__type,__type,__type,__type,__type> res);
+
+//testcase and r
+const int test_case = 1000,r = 10;
+
 
 void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     std::fstream out("./logs/TOGG_FINGER.log",std::ofstream::app);
@@ -503,26 +515,21 @@ void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     alg = build_graph_HNSW(G,gist_base,gist_dim,ef,nb);
     std::cout << alg << std::endl;
 
-    int correct = 0;
-
-    //for (int i = 0; i < N; i++) {
-    //    std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg->searchKnn((void*)&(G.Nodes[i]->vec[0]), 1);
-    //    hnswlib::labeltype label = result.top().second;
-    //    if (label == i) correct++;
-    //    std::cout << "label is " << label << std::endl;
-
-        //if(debug == 1){
-        //    std::cout << G.Nodes[i]->vec[0] << std::endl;
-        //}
-
-//    }
-
     Get_Graph(G,alg);
     std::cout << alg << std::endl;
     std::cout << "End of getting the HNSW Graph" << std::endl;
+    
+    
+    std::vector<std::shared_ptr<Node> > Nodes;
+    for(int i = 0 ;i < test_case ;i ++){
+        Nodes.push_back(G.Nodes[i]);
+    }
+    const std::tuple<Eigen::MatrixXf,__type,__type,__type,__type,__type> res = computeParameters(Nodes,r);
+    finger_precalculate_1(G,res);
 
     //ask for recall
     //recall@K
+    int correct = 0;
     for(int i = 0;i < testnum;i ++){
 
         std::cout << "*" << i << std::endl;
@@ -534,7 +541,7 @@ void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
 
         start = time(NULL);
         testresult = OGS_KDT_Routing_test1(G,G.Nodes[0].get(),G.Nodes[i].get(),K);
-        testresult = OGA_routing_test1(G,testresult,G.Nodes[i].get(),K);
+        testresult = OGA_routing_test1(G,testresult,G.Nodes[i].get(),K,res);
         stop = time(NULL);
         usedtime += stop - start;
 
@@ -548,7 +555,7 @@ void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
 
         std::cout << "Ansresult:" << std::endl;
         int dd = K;
-        while(dd--){
+        while(!result.empty()){
             auto now = result.top(); result.pop();
             std::cout << now.second << " ";
             std::cout << "dis:" << dis(G.Nodes[now.second] -> vec,G.Nodes[i]->vec) << " ";
@@ -567,12 +574,13 @@ void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     std::cout << "Recall@" << K << " is " << recall << "." << std::endl;
     std::cout << "Handling " << testnum << " queries needs " << usedtime << " seconds " << std::endl;
 
+    out << "" << std::endl;
     out << "Nowtime is " << stop << "." << std::endl;
     out << "Use gist_1M, neighborsize = " << nb << " , ef_construction = " << ef << "." << std::endl;
 
     out << "testnum = " << testnum << ", K =" << K << "." << std::endl;
-    out << "" << std::endl;
-    out << "Recall@K = " << recall << ". Time: " << usedtime << ". Time per test is " << 1.0 * (stop - start) / testnum << "." << std::endl; 
+    
+    out << "Recall@K = " << recall << ". Time: " << usedtime << "s. Time per test is " << 1.0 * (stop - start) / testnum << "s." << std::endl; 
 
     std::cout << "End of testing the TOGG-FINGER search by using gist" << std::endl;
     delete alg;
@@ -581,7 +589,7 @@ void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
 }
 
 void test_TOGG_FINGER_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
-    std::fstream out("./logs/TOGG.log",std::ofstream::app);
+    std::fstream out("./logs/TOGG_FINGER.log",std::ofstream::app);
     time_t start,stop,usedtime = 0;
 
     std::cout << "Start testing the TOGG-FINGER search by using sift" << std::endl;
@@ -591,29 +599,24 @@ void test_TOGG_FINGER_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     alg = build_graph_HNSW(G,sift_base,sift_dim,ef,nb);
     std::cout << alg << std::endl;
 
-    int correct = 0;
-
-    //for (int i = 0; i < N; i++) {
-    //    std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg->searchKnn((void*)&(G.Nodes[i]->vec[0]), 1);
-    //    hnswlib::labeltype label = result.top().second;
-    //    if (label == i) correct++;
-    //    std::cout << "label is " << label << std::endl;
-
-        //if(debug == 1){
-        //    std::cout << G.Nodes[i]->vec[0] << std::endl;
-        //}
-
-//    }
-
     Get_Graph(G,alg);
     std::cout << alg << std::endl;
     std::cout << "End of getting the HNSW Graph" << std::endl;
+    
+    
+    std::vector<std::shared_ptr<Node> > Nodes;
+    for(int i = 0 ;i < test_case ;i ++){
+        Nodes.push_back(G.Nodes[i]);
+    }
+    const std::tuple<Eigen::MatrixXf,__type,__type,__type,__type,__type> res = computeParameters(Nodes,r);
+    finger_precalculate_1(G,res);
 
     //ask for recall
     //recall@K
+    int correct = 0;
     for(int i = 0;i < testnum;i ++){
 
-        std::cout << "*" << i << std::endl;
+        std::cout << "*" << i  << " *" << G.Nodes[i]->index << std::endl;
         std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg->searchKnn((void*)&(G.Nodes[i]->vec[0]), K);
         
         std::set<int> ans;
@@ -622,7 +625,7 @@ void test_TOGG_FINGER_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
 
         start = time(NULL);
         testresult = OGS_KDT_Routing_test1(G,G.Nodes[0].get(),G.Nodes[i].get(),K);
-        testresult = OGA_routing_test1(G,testresult,G.Nodes[i].get(),K);
+        testresult = OGA_routing_test1(G,testresult,G.Nodes[i].get(),K,res);
         stop = time(NULL);
         usedtime += stop - start;
 
@@ -636,7 +639,7 @@ void test_TOGG_FINGER_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
 
         std::cout << "Ansresult:" << std::endl;
         int dd = K;
-        while(dd--){
+        while(!result.empty()){
             auto now = result.top(); result.pop();
             std::cout << now.second << " ";
             std::cout << "dis:" << dis(G.Nodes[now.second] -> vec,G.Nodes[i]->vec) << " ";
@@ -655,12 +658,13 @@ void test_TOGG_FINGER_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     std::cout << "Recall@" << K << " is " << recall << "." << std::endl;
     std::cout << "Handling " << testnum << " queries needs " << usedtime << " seconds " << std::endl;
 
+    out << "" << std::endl;
     out << "Nowtime is " << stop << "." << std::endl;
     out << "Use sift_10000, neighborsize = " << nb << " , ef_construction = " << ef << "." << std::endl;
 
     out << "testnum = " << testnum << ", K =" << K << "." << std::endl;
-    out << "" << std::endl;
-    out << "Recall@K = " << recall << ". Time: " << usedtime << ". Time per test is " << 1.0 * (stop - start) / testnum << "." << std::endl; 
+    
+    out << "Recall@K = " << recall << ". Time: " << usedtime << "s. Time per test is " << 1.0 * (stop - start) / testnum << "s." << std::endl; 
 
     std::cout << "End of testing the TOGG-FINGER search by using sift" << std::endl;
     delete alg;
@@ -678,8 +682,8 @@ int main(){
 //    test_OGS_KDT_Routing();
 //    test_Greedy_Search(10,10,200,16);
 //    test_TOGG_gist(10,10,200,16);
-//    test_TOGG_sift(10,10,200,16);
+//    test_TOGG_sift(100,10,200,16);
     test_TOGG_FINGER_gist(10,10,200,16);
-//    test_TOGG_FINGER_sift(10,10,200,16);
+//    test_TOGG_FINGER_sift(10,10,200,64);
     return 0;
 }
