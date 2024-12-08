@@ -46,3 +46,22 @@ testresult:
 0 dis:0 856580 dis:0.352968 870365 dis:1.49073 738650 dis:1.51817 477826 dis:1.52793 454 dis:1.60512 584107 dis:1.62499 859557 dis:1.63708 538389 dis:1.6374 142314 dis:1.64078
 Ansresult:
 533452 dis:1.69806 802955 dis:1.67368 883811 dis:1.64646 538389 dis:1.6374 454 dis:1.60512 477826 dis:1.52793 738650 dis:1.51817 870365 dis:1.49073 856580 dis:0.352968 0 dis:0
+Nowtime is 1733390104.
+Use sift_10000, neighborsize = 16 , ef_construction = 200.
+testnum = 100, K =10.
+Recall@K = 0.001. Time: 23s. Time per test is 0s.
+
+Nowtime is 1733390142.
+Use sift_10000, neighborsize = 16 , ef_construction = 200.
+testnum = 10, K =10.
+Recall@K = 0. Time: 3s. Time per test is 0.1s.
+
+Nowtime is 1733390381.
+Use sift_10000, neighborsize = 16 , ef_construction = 200.
+testnum = 10, K =10.
+Recall@K = 0. Time: 2s. Time per test is 0s.
+
+Nowtime is 1733390483.
+Use sift_10000, neighborsize = 16 , ef_construction = 200.
+testnum = 10, K =10.
+Recall@K = 0.99. Time: 3s. Time per test is 0.1s.

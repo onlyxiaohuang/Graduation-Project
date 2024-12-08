@@ -17,7 +17,7 @@ hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G, int N,int Dim = dim
     //Add data to index
     for(int i = 0;i < N;i ++){
         alg_hnsw -> addPoint((void*)&(G.Nodes[i]->vec[0]),i);
-    }        
+    }
 
     if(debug == 1){
         std::cout << "Start testing, address of alg_hnsw is .."  << std::endl; 
@@ -29,7 +29,7 @@ hnswlib::HierarchicalNSW<__type>* build_graph_HNSW(Graph &G, int N,int Dim = dim
         std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg_hnsw->searchKnn((void*)&(G.Nodes[i]->vec[0]), 1);
         hnswlib::labeltype label = result.top().second;
         if (label == i) correct++;
-        std::cout << "label is " << label << std::endl;
+        //std::cout << "label is " << label << std::endl;
 
         //if(debug == 1){
         //    std::cout << G.Nodes[i]->vec[0] << std::endl;

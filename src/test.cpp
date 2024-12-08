@@ -167,7 +167,9 @@ void test_OGS_KDT_Routing(){
 }
 
 //TEST LOADING DATA
-extern void load_data(char* filename,float*& data, unsigned& num,unsigned& dim);
+
+void load_data_float(char* filename,float*& data, unsigned& num,unsigned& dim);
+void load_data_int(char* filename,int*& data, unsigned& num,unsigned& dim);
 
 void test_load_data_sift(){
     std::cout << "Start testing the loading data" << std::endl;
@@ -176,7 +178,7 @@ void test_load_data_sift(){
     //gist
     __type *data = NULL;
     unsigned int gb = sift_base,dm = sift_dim;
-    load_data(filename,data,gb,dm);
+    load_data_float(filename,data,gb,dm);
     
     int nowindex = 0;
     G.Nodes.resize(gb);
@@ -205,7 +207,7 @@ void test_load_data_gist(){
     //gist
     __type *data = NULL;
     unsigned int gb = gist_base,dm = gist_dim;
-    load_data(filename,data,gb,dm);
+    load_data_float(filename,data,gb,dm);
     
     int nowindex = 0;
     G.Nodes.resize(gb);
@@ -227,6 +229,38 @@ void test_load_data_gist(){
 
 }
 
+std::vector< std::vector<__type> > Query;
+std::vector< std::vector<int> > Groundtruth;
+
+//learn to get querys
+void load_query_and_groundtruth(char *qfile,char *gfile,unsigned qsize,unsigned gsize,unsigned Dim){
+    __type *qdata = NULL;
+    int *gdata = NULL;
+    load_data_float(qfile,qdata,qsize,Dim);
+    load_data_int(gfile,gdata,qsize,gsize);
+
+    int qindex = 0,gindex = 0;
+    Query.resize(qsize); Groundtruth.resize(qsize);
+    for(int i = 0;i < qsize;i ++){
+        std::vector<__type> query;
+        std::vector<int> ans;
+        for(int j = 0; j < Dim;j ++){
+            query.push_back(qdata[qindex ++]);
+        }
+
+        for(int j = 0; j < gsize;j ++){
+            ans.push_back(gdata[gindex ++]);
+        }
+
+        Query[i].swap(query);
+        Groundtruth[i].swap(ans);
+
+    }
+
+    delete qdata; delete gdata;
+
+}
+
 extern std::vector<const Node*> Greedy_Graph_Search(Node* q,Node* p,int efs);
 void test_Greedy_Search(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     std::fstream out("./logs/Greedy_Search.log",std::ofstream::app);
@@ -234,7 +268,8 @@ void test_Greedy_Search(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
 
     std::cout << "Start testing the greedy search by using sift" << std::endl;
     test_load_data_sift();
-    
+    load_query_and_groundtruth("./test/siftsmall/siftsmall_query.fvecs","./test/siftsmall/siftsmall_groundtruth.ivecs",sift_query,sift_K,sift_dim);
+
     std::cout << "Start getting the HNSW Graph" << std::endl;
     alg = build_graph_HNSW(G,sift_base,sift_dim,ef,nb);
     std::cout << alg << std::endl;
@@ -318,6 +353,8 @@ void test_TOGG_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
 
     std::cout << "Start testing the TOGG search by using gist" << std::endl;
     test_load_data_gist();
+    load_query_and_groundtruth("./test/gist/gist_query.fvecs","./test/gist/gist_groundtruth.ivecs",gist_query,gist_K,gist_dim);
+
     
     std::cout << "Start getting the HNSW Graph" << std::endl;
     alg = build_graph_HNSW(G,gist_base,gist_dim,ef,nb);
@@ -345,16 +382,19 @@ void test_TOGG_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     //recall@K
     for(int i = 0;i < testnum;i ++){
 
-        std::cout << "*" << i  << " *" << G.Nodes[i]->index << std::endl;
-        std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg->searchKnn((void*)&(G.Nodes[i]->vec[0]), K);
+        std::cout << "*" << i << std::endl;
         
         std::set<int> ans;
 
         std::vector <Node*> testresult;
 
         start = time(NULL);
-        testresult = OGS_KDT_Routing(G,G.Nodes[0].get(),G.Nodes[i].get(),K);
-        testresult = OGA_routing(G,testresult,G.Nodes[i].get(),K);
+        
+        Node *tmp(new Node);
+        tmp -> vec = Query[i];
+
+        testresult = OGS_KDT_Routing(G,G.Nodes[0].get(),tmp,K);
+        testresult = OGA_routing(G,testresult,tmp,K);
         stop = time(NULL);
         usedtime += stop - start;
 
@@ -362,17 +402,18 @@ void test_TOGG_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
         for(auto tt:testresult){
             ans.insert(tt -> index);
             std::cout << tt -> index << " ";
-            std::cout << "dis:" << dis(tt -> vec,G.Nodes[i]->vec) << " ";
+            std::cout << "dis:" << dis(tt -> vec,tmp -> vec) << " ";
         }
         std::cout << std::endl;
 
         std::cout << "Ansresult:" << std::endl;
         int dd = K;
-        while(!result.empty()){
-            auto now = result.top(); result.pop();
-            std::cout << now.second << " ";
-            std::cout << "dis:" << dis(G.Nodes[now.second] -> vec,G.Nodes[i]->vec) << " ";
-            if(ans.find(now.second) != ans.end()){
+        for(int j = 0; j < K; j ++){
+//            auto now = result.top(); result.pop();
+            auto now = Groundtruth[i][j];
+            std::cout << now << " ";
+            std::cout << "dis:" << dis(G.Nodes[now] -> vec,tmp -> vec) << " ";
+            if(ans.find(now) != ans.end()){
                 correct ++;
             }
         }
@@ -380,7 +421,7 @@ void test_TOGG_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
 
     //    std::cout << "Now Node:" << std::endl;
     //    std::cout << i <<" " <<  dis(G.Nodes[i] -> vec,G.Nodes[i] -> vec) << std::endl;
-
+        delete tmp;
     }
 
     float recall = 1.0 * correct / testnum / K;
@@ -407,6 +448,8 @@ void test_TOGG_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
 
     std::cout << "Start testing the TOGG search by using gist" << std::endl;
     test_load_data_sift();
+    load_query_and_groundtruth("./test/siftsmall/siftsmall_query.fvecs","./test/siftsmall/siftsmall_groundtruth.ivecs",sift_query,sift_K,sift_dim);
+
     
     std::cout << "Start getting the HNSW Graph" << std::endl;
     alg = build_graph_HNSW(G,sift_base,sift_dim,ef,nb);
@@ -435,15 +478,18 @@ void test_TOGG_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     for(int i = 0;i < testnum;i ++){
 
         std::cout << "*" << i << std::endl;
-        std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg->searchKnn((void*)&(G.Nodes[i]->vec[0]), K);
         
         std::set<int> ans;
 
         std::vector <Node*> testresult;
 
         start = time(NULL);
-        testresult = OGS_KDT_Routing(G,G.Nodes[0].get(),G.Nodes[i].get(),K);
-        testresult = OGA_routing(G,testresult,G.Nodes[i].get(),K);
+        
+        Node *tmp(new Node);
+        tmp -> vec = Query[i];
+
+        testresult = OGS_KDT_Routing(G,G.Nodes[0].get(),tmp,K);
+        testresult = OGA_routing(G,testresult,tmp,K);
         stop = time(NULL);
         usedtime += stop - start;
 
@@ -451,17 +497,18 @@ void test_TOGG_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
         for(auto tt:testresult){
             ans.insert(tt -> index);
             std::cout << tt -> index << " ";
-            std::cout << "dis:" << dis(tt -> vec,G.Nodes[i]->vec) << " ";
+            std::cout << "dis:" << dis(tt -> vec,tmp -> vec) << " ";
         }
         std::cout << std::endl;
 
         std::cout << "Ansresult:" << std::endl;
         int dd = K;
-        while(!result.empty()){
-            auto now = result.top(); result.pop();
-            std::cout << now.second << " ";
-            std::cout << "dis:" << dis(G.Nodes[now.second] -> vec,G.Nodes[i]->vec) << " ";
-            if(ans.find(now.second) != ans.end()){
+        for(int j = 0; j < K; j ++){
+//            auto now = result.top(); result.pop();
+            auto now = Groundtruth[i][j];
+            std::cout << now << " ";
+            std::cout << "dis:" << dis(G.Nodes[now] -> vec,tmp -> vec) << " ";
+            if(ans.find(now) != ans.end()){
                 correct ++;
             }
         }
@@ -469,7 +516,7 @@ void test_TOGG_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
 
     //    std::cout << "Now Node:" << std::endl;
     //    std::cout << i <<" " <<  dis(G.Nodes[i] -> vec,G.Nodes[i] -> vec) << std::endl;
-
+        delete tmp;
     }
 
     float recall = 1.0 * correct / testnum / K;
@@ -510,6 +557,7 @@ void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
 
     std::cout << "Start testing the TOGG-FINGER search by using gist" << std::endl;
     test_load_data_gist();
+    load_query_and_groundtruth("./test/gist/gist_query.fvecs","./test/gist/gist_groundtruth.ivecs",gist_query,gist_K,gist_dim);
     
     std::cout << "Start getting the HNSW Graph" << std::endl;
     alg = build_graph_HNSW(G,gist_base,gist_dim,ef,nb);
@@ -533,15 +581,18 @@ void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     for(int i = 0;i < testnum;i ++){
 
         std::cout << "*" << i << std::endl;
-        std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg->searchKnn((void*)&(G.Nodes[i]->vec[0]), K);
         
         std::set<int> ans;
 
         std::vector <Node*> testresult;
 
         start = time(NULL);
-        testresult = OGS_KDT_Routing_test1(G,G.Nodes[0].get(),G.Nodes[i].get(),K);
-        testresult = OGA_routing_test1(G,testresult,G.Nodes[i].get(),K,res);
+        
+        Node *tmp(new Node);
+        tmp -> vec = Query[i];
+
+        testresult = OGS_KDT_Routing_test1(G,G.Nodes[0].get(),tmp,K);
+        testresult = OGA_routing_test1(G,testresult,tmp,K,res);
         stop = time(NULL);
         usedtime += stop - start;
 
@@ -549,17 +600,18 @@ void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
         for(auto tt:testresult){
             ans.insert(tt -> index);
             std::cout << tt -> index << " ";
-            std::cout << "dis:" << dis(tt -> vec,G.Nodes[i]->vec) << " ";
+            std::cout << "dis:" << dis(tt -> vec,tmp -> vec) << " ";
         }
         std::cout << std::endl;
 
         std::cout << "Ansresult:" << std::endl;
         int dd = K;
-        while(!result.empty()){
-            auto now = result.top(); result.pop();
-            std::cout << now.second << " ";
-            std::cout << "dis:" << dis(G.Nodes[now.second] -> vec,G.Nodes[i]->vec) << " ";
-            if(ans.find(now.second) != ans.end()){
+        for(int j = 0; j < K; j ++){
+//            auto now = result.top(); result.pop();
+            auto now = Groundtruth[i][j];
+            std::cout << now << " ";
+            std::cout << "dis:" << dis(G.Nodes[now] -> vec,tmp -> vec) << " ";
+            if(ans.find(now) != ans.end()){
                 correct ++;
             }
         }
@@ -567,7 +619,7 @@ void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
 
     //    std::cout << "Now Node:" << std::endl;
     //    std::cout << i <<" " <<  dis(G.Nodes[i] -> vec,G.Nodes[i] -> vec) << std::endl;
-
+        delete tmp;
     }
 
     float recall = 1.0 * correct / testnum / K;
@@ -594,6 +646,8 @@ void test_TOGG_FINGER_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
 
     std::cout << "Start testing the TOGG-FINGER search by using sift" << std::endl;
     test_load_data_sift();
+    load_query_and_groundtruth("./test/siftsmall/siftsmall_query.fvecs","./test/siftsmall/siftsmall_groundtruth.ivecs",sift_query,sift_K,sift_dim);
+
     
     std::cout << "Start getting the HNSW Graph" << std::endl;
     alg = build_graph_HNSW(G,sift_base,sift_dim,ef,nb);
@@ -614,18 +668,21 @@ void test_TOGG_FINGER_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     //ask for recall
     //recall@K
     int correct = 0;
-    for(int i = 0;i < testnum;i ++){
+        for(int i = 0;i < testnum;i ++){
 
-        std::cout << "*" << i  << " *" << G.Nodes[i]->index << std::endl;
-        std::priority_queue<std::pair<__type, hnswlib::labeltype>> result = alg->searchKnn((void*)&(G.Nodes[i]->vec[0]), K);
+        std::cout << "*" << i << std::endl;
         
         std::set<int> ans;
 
         std::vector <Node*> testresult;
 
         start = time(NULL);
-        testresult = OGS_KDT_Routing_test1(G,G.Nodes[0].get(),G.Nodes[i].get(),K);
-        testresult = OGA_routing_test1(G,testresult,G.Nodes[i].get(),K,res);
+        
+        Node *tmp(new Node);
+        tmp -> vec = Query[i];
+
+        testresult = OGS_KDT_Routing_test1(G,G.Nodes[0].get(),tmp,K);
+        testresult = OGA_routing_test1(G,testresult,tmp,K,res);
         stop = time(NULL);
         usedtime += stop - start;
 
@@ -633,17 +690,18 @@ void test_TOGG_FINGER_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
         for(auto tt:testresult){
             ans.insert(tt -> index);
             std::cout << tt -> index << " ";
-            std::cout << "dis:" << dis(tt -> vec,G.Nodes[i]->vec) << " ";
+            std::cout << "dis:" << dis(tt -> vec,tmp -> vec) << " ";
         }
         std::cout << std::endl;
 
         std::cout << "Ansresult:" << std::endl;
         int dd = K;
-        while(!result.empty()){
-            auto now = result.top(); result.pop();
-            std::cout << now.second << " ";
-            std::cout << "dis:" << dis(G.Nodes[now.second] -> vec,G.Nodes[i]->vec) << " ";
-            if(ans.find(now.second) != ans.end()){
+        for(int j = 0; j < K; j ++){
+//            auto now = result.top(); result.pop();
+            auto now = Groundtruth[i][j];
+            std::cout << now << " ";
+            std::cout << "dis:" << dis(G.Nodes[now] -> vec,tmp -> vec) << " ";
+            if(ans.find(now) != ans.end()){
                 correct ++;
             }
         }
@@ -651,7 +709,7 @@ void test_TOGG_FINGER_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
 
     //    std::cout << "Now Node:" << std::endl;
     //    std::cout << i <<" " <<  dis(G.Nodes[i] -> vec,G.Nodes[i] -> vec) << std::endl;
-
+        delete tmp;
     }
 
     float recall = 1.0 * correct / testnum / K;
@@ -682,7 +740,7 @@ int main(){
 //    test_OGS_KDT_Routing();
 //    test_Greedy_Search(10,10,200,16);
 //    test_TOGG_gist(10,10,200,16);
-//    test_TOGG_sift(100,10,200,16);
+//    test_TOGG_sift(10,10,200,16);
     test_TOGG_FINGER_gist(10,10,200,16);
 //    test_TOGG_FINGER_sift(10,10,200,64);
     return 0;

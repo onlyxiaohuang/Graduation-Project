@@ -34,7 +34,7 @@ Graph initialize(int N,int L,int R,int seed,int dim){//N nodes with vector in ra
 }
 
 //read fvecs data
-void load_data(char* filename,float*& data, unsigned& num,unsigned& dim){
+void load_data_float(char* filename,float*& data, unsigned& num,unsigned& dim){
 
     std::cout << "start to load data" << std::endl;
     std::ifstream in(filename,std::ios::binary);
@@ -51,6 +51,49 @@ void load_data(char* filename,float*& data, unsigned& num,unsigned& dim){
     size_t fsize = (size_t)ss;
     num = (unsigned)(fsize / (dim + 1) / 4);
     data = new float[num * dim];
+
+    in.seekg(0,std::ios::beg);
+    for(size_t i = 0;i < num ;i ++){
+        in.seekg(4,std::ios::cur);
+        in.read((char*)data + i * dim * 4,dim * 4);
+    }
+    /*
+    for(size_t i = 0;i < num;i ++){
+        std::cout << (float)data[i];
+        if(!i){
+            std::cout << " ";
+            continue;
+        }
+        if(i % (dim - 1) != 0){
+            std::cout << " ";
+        }
+        else{
+            std::cout << std::endl;
+        }
+    }*/
+
+    in.close();
+    std::cout << "load data successfully" << std::endl;
+}
+
+//read ivecs data
+void load_data_int(char* filename,int*& data, unsigned& num,unsigned& dim){
+
+    std::cout << "start to load data" << std::endl;
+    std::ifstream in(filename,std::ios::binary);
+    
+    if(!in.is_open()){
+        std::cout << "open file error" << std::endl;
+        exit( -1 );
+    }
+
+    in.read((char*)&dim,sizeof(unsigned));
+    in.seekg(0,std::ios::end);
+
+    std::ios::pos_type ss = in.tellg();
+    size_t fsize = (size_t)ss;
+    num = (unsigned)(fsize / (dim + 1) / 4);
+    data = new int[num * dim];
 
     in.seekg(0,std::ios::beg);
     for(size_t i = 0;i < num ;i ++){
@@ -143,3 +186,4 @@ std::vector<const Node*> Greedy_Graph_Search(Node* q,Node* p,int efs){ //FINGER 
     }
     return tmp;
 }
+
