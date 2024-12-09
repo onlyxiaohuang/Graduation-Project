@@ -65,3 +65,8 @@ Nowtime is 1733390483.
 Use sift_10000, neighborsize = 16 , ef_construction = 200.
 testnum = 10, K =10.
 Recall@K = 0.99. Time: 3s. Time per test is 0.1s.
+
+Nowtime is 1733749586.
+Use sift_10000, neighborsize = 64 , ef_construction = 200.
+testnum = 10, K =10.
+Recall@K = 1. Time: 2s. Time per test is 0s.
