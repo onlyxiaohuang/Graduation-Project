@@ -455,7 +455,7 @@ void test_TOGG_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     std::cout << "Start getting the HNSW Graph" << std::endl;
     alg = build_graph_HNSW(G,sift_base,sift_dim,ef,nb);
     std::cout << alg << std::endl;
-    delete alg;
+    
 
     int correct = 0;
 
@@ -472,6 +472,7 @@ void test_TOGG_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
 //    }
 
     Get_Graph(G,alg);
+    delete alg;
     std::cout << alg << std::endl;
     std::cout << "End of getting the HNSW Graph" << std::endl;
 
@@ -536,7 +537,7 @@ void test_TOGG_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     out << "Recall@K = " << recall << ". Time: " << usedtime << "s. Time per test is " << 1.0 * (stop - start) / testnum << "s." << std::endl; 
 
     std::cout << "End of testing the TOGG search by using sift" << std::endl;
-    delete alg;
+    //delete alg;
     out.close();
 
 }
@@ -566,8 +567,9 @@ void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     std::cout << alg << std::endl;
 
     Get_Graph(G,alg);
-    delete alg;
+    
     std::cout << alg << std::endl;
+    delete alg;
     std::cout << "End of getting the HNSW Graph" << std::endl;
     
     
@@ -638,7 +640,7 @@ void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     out << "Recall@K = " << recall << ". Time: " << usedtime << "s. Time per test is " << 1.0 * (stop - start) / testnum << "s." << std::endl; 
 
     std::cout << "End of testing the TOGG-FINGER search by using gist" << std::endl;
-    delete alg;
+    //delete alg;
     out.close();
 
 }
@@ -686,7 +688,11 @@ void test_TOGG_FINGER_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
         tmp -> vec = Query[i];
 
         testresult = OGS_KDT_Routing_test1(G,G.Nodes[0].get(),tmp,K);
+        
+        std::cout << "begin to OGS_test" << std::endl;
         testresult = OGA_routing_test1(G,testresult,tmp,K,res);
+        std::cout << "end of OGS_test" << std::endl;
+
         stop = time(NULL);
         usedtime += stop - start;
 
@@ -746,6 +752,6 @@ int main(){
 //    test_TOGG_gist(10,10,200,16);
 //    test_TOGG_sift(10,10,200,16);
     test_TOGG_FINGER_gist(10,10,200,16);
-//    test_TOGG_FINGER_sift(10,10,200,64);
+//    test_TOGG_FINGER_sift(10,10,200,32);
     return 0;
 }

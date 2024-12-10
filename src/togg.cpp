@@ -492,13 +492,13 @@ std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,in
     
         tt -> nowdistoq = dis(tt->vec,q->vec);
 
-        //std::cout <<"*" << tt  << std::endl;
+        //std::cout << "*" << tt  << std::endl;
         for(int i = 0;i < tt -> tonode.size();i ++){
             auto n = tt -> tonode[i];
- //           std::cout << 1 << std::endl;
- //           std::cout <<"*" << tt  << std::endl;
+ //          std::cout << 1 << std::endl;
+ //          std::cout <<"*" << tt  << std::endl;
             __type ndis = finger_dis(tt -> Pqres,tt -> Pdres[i]);
- //           std::cout << "*" << n.get() << std::endl;
+//            std::cout << "*" << n.get() << std::endl;
 
             if(Visited.find(n.get()) != Visited.end()){
                 if( ndis <= range ){
@@ -512,17 +512,22 @@ std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,in
                 __type hdis = ndis;
 
                 while(true){
-                    //std::cout << "*" << h << std::endl;
+    //                std::cout << 2 << std::endl;
+    //                std::cout << "*" << h << std::endl;
                     int x = 0;
                     for(int j = 0;j < h -> tonode.size();j ++){
                         auto hn = h -> tonode[j];
-                        //std::cout << 2 << std::endl;
+                        
                         if( finger_dis (h -> Pqres,h -> Pdres[j]) < finger_dis (h -> Pqres,h -> Pdres[x]) ){
                             x = j;
                         }
                     }
-
-                    //std::cout << 3 << std::endl;
+                    if(h -> tonode.size() == 0){
+                        break;
+                    }
+//                    std::cout << 3 << std::endl;
+//                    std::cout << x << " " << h -> tonode.size() << std::endl;
+//                    std::cout << "*" << h -> tonode[x] << std::endl;
                     if(finger_dis (h -> Pqres,h -> Pdres[x]) < hdis){
                         hdis = finger_dis (h -> Pqres,h -> Pdres[x]);
                         h = h -> tonode[x].get();
@@ -532,7 +537,8 @@ std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,in
                     }
 
                 }
-                //std::cout << 4 << std::endl;
+    //            std::cout << 4 << std::endl;
+    //            std::cout << "*" << h << std::endl;
                 if(hdis <= range){
                     C.push_back(h);
                     h ->nowdistoq = hdis;
