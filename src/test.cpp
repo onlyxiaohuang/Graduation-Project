@@ -586,7 +586,8 @@ void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     for(int i = 0;i < testnum;i ++){
 
         std::cout << "*" << i << std::endl;
-        
+        //if(i == 3)  continue;
+
         std::set<int> ans;
 
         std::vector <Node*> testresult;
@@ -626,6 +627,7 @@ void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     //    std::cout << i <<" " <<  dis(G.Nodes[i] -> vec,G.Nodes[i] -> vec) << std::endl;
         delete tmp;
     }
+   // testnum --;
 
     float recall = 1.0 * correct / testnum / K;
     std::cout << "Recall@" << K << " is " << recall << "." << std::endl;
@@ -751,7 +753,7 @@ int main(){
 //    test_Greedy_Search(10,10,200,16);
 //    test_TOGG_gist(10,10,200,16);
 //    test_TOGG_sift(10,10,200,16);
-    test_TOGG_FINGER_gist(10,10,200,16);
+    test_TOGG_FINGER_gist(10,10,200,20);
 //    test_TOGG_FINGER_sift(10,10,200,32);
     return 0;
 }

@@ -450,17 +450,22 @@ std::vector<Node *> OGS_KDT_Routing_test1(Graph &G,Node *p,Node *q,int l){
 }
 
 
-
+static int nowtesting = 0;
 //TOGG algorithm 5-test1 by using FINGER
 //O(n * logn * d^2 * dim)
 std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,int l,std::tuple<MatrixXf,__type,__type,__type,__type,__type> res){
+    std::fstream out("./logs/Test.log",std::ofstream::app);
+
+
     auto cmp = [&q](const Node *a,const Node *b) -> bool{
         return a->index < b->index;
     };//the increasing order
 
-
+    nowtesting ++;
+    out << "* " << nowtesting << std::endl;
 
     finger_precalculate_2(G,res,q);
+    std::cout << "Finger_Precalculate is over" << std::endl;
 
     //low rank calculation
     auto finger_dis = [&res](VectorXf &Pqres,VectorXf &Pdres){
@@ -491,6 +496,9 @@ std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,in
         //set nowdistoq
     
         tt -> nowdistoq = dis(tt->vec,q->vec);
+
+        out << "Nownode is " << tt -> index << " " << tt -> nowdistoq << std::endl;
+        std::cout << "Nownode is " << tt -> index << " " << tt -> nowdistoq << std::endl;
 
         //std::cout << "*" << tt  << std::endl;
         for(int i = 0;i < tt -> tonode.size();i ++){
@@ -556,6 +564,8 @@ std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,in
             C.resize(l);
         }
     }
+    
+    out.close();
 
     return C;
 }
