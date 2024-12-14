@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <algorithm>
 #include <memory>
+#include <chrono>
 
 //eigen
 #include "./libs/eigen/Eigen/SVD"
@@ -89,3 +90,6 @@ Graph initialize(int N, int L, int R, int seed, int dim);
 __type dis(const std::vector<__type> &x,const std::vector<__type> &y);
 
 std::vector<const Node*> Greedy_Graph_Search(Node* q,Node* p,int efs);
+
+void TimeStart();
+double TimeEnd();

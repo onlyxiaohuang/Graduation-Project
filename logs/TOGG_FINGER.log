@@ -123,3 +123,26 @@ testresult:
 242301 dis:0.40913 857055 dis:0.450613 314243 dis:0.474646 911389 dis:0.486325 706382 dis:0.495738 728075 dis:0.500794 199090 dis:0.501045 649129 dis:0.505124 161401 dis:0.50728 344026 dis:0.518974
 Ansresult:
 242301 dis:0.40913 857055 dis:0.450613 314243 dis:0.474646 911389 dis:0.486325 706382 dis:0.495738 728075 dis:0.500794 199090 dis:0.501045 911387 dis:0.501307 649129 dis:0.505124 161401 dis:0.50728
+Use gist_1M, neighborsize = 32 , ef_construction = 200.
+testnum = 10, K =10.
+Recall@K = 1. Time: 2.20665s. Time per test is 0.220665s.
+
+Use gist_1M, neighborsize = 32 , ef_construction = 200.
+testnum = 10, K =10.
+Recall@K = 1. Time: 2.03907s. Time per test is 0.203907s.
+
+Use gist_1M, neighborsize = 16 , ef_construction = 200.
+testnum = 10, K =10.
+Recall@K = 0.58. Time: 5941.48s. Time per test is 594.148s.
+
+Use gist_1M, neighborsize = 20 , ef_construction = 200.
+testnum = 10, K =10.
+Recall@K = 0.38. Time: 5938.59s. Time per test is 593.859s.
+
+Use gist_1M, neighborsize = 32 , ef_construction = 200.
+testnum = 10, K =10.
+Recall@K = 0.77. Time: 5410.26s. Time per test is 541.026s.
+
+Use gist_1M, neighborsize = 64 , ef_construction = 200.
+testnum = 10, K =10.
+Recall@K = 0.84. Time: 5099.82s. Time per test is 509.982s.

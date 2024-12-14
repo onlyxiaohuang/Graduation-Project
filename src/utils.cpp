@@ -11,6 +11,17 @@ int random_int(std::mt19937 &rd,int l,int r){
     return now;
 }
 
+static decltype (std::chrono::system_clock::now()) begin,end;
+void TimeStart(){
+    begin = std::chrono::system_clock::now();
+}
+double TimeEnd(){
+    end = std::chrono::system_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
+    return double(duration.count()) * std::chrono::microseconds::period::num / std::chrono::microseconds::period::den;
+}
+
+
 Graph initialize(int N,int L,int R,int seed,int dim){//N nodes with vector in range[L,R]
     auto rd = random_begin(seed);
     

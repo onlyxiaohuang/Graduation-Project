@@ -395,6 +395,7 @@ void test_TOGG_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
         tmp -> vec = Query[i];
 
         testresult = OGS_KDT_Routing(G,G.Nodes[0].get(),tmp,K);
+        
         testresult = OGA_routing(G,testresult,tmp,K);
         stop = time(NULL);
         usedtime += stop - start;
@@ -556,7 +557,8 @@ const int test_case = 1000,r = 10;
 
 void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     std::fstream out("./logs/TOGG_FINGER.log",std::ofstream::app);
-    time_t start,stop,usedtime = 0;
+//    time_t start,stop,usedtime = 0;
+    double usedtime = 0;
 
     std::cout << "Start testing the TOGG-FINGER search by using gist" << std::endl;
     test_load_data_gist();
@@ -592,17 +594,24 @@ void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
 
         std::vector <Node*> testresult;
 
-        start = time(NULL);
+//        start = time(NULL);
         
         Node *tmp(new Node);
         tmp -> vec = Query[i];
 
+        TimeStart();
         testresult = OGS_KDT_Routing_test1(G,G.Nodes[0].get(),tmp,K);
+        std::cout << "Routing is over" << std::endl;
         testresult = OGA_routing_test1(G,testresult,tmp,K,res);
-        stop = time(NULL);
-        usedtime += stop - start;
+        double timestamp = TimeEnd();
+        std::cout << "Used " << timestamp << " seconds." << std::endl;
+
+//        stop = time(NULL);
+        usedtime += timestamp;
 
         std::cout << "testresult:" << std::endl;
+        
+        
         for(auto tt:testresult){
             ans.insert(tt -> index);
             std::cout << tt -> index << " ";
@@ -634,12 +643,12 @@ void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     std::cout << "Handling " << testnum << " queries needs " << usedtime << " seconds " << std::endl;
 
     out << "" << std::endl;
-    out << "Nowtime is " << stop << "." << std::endl;
+    //out << "Nowtime is " << stop << "." << std::endl;
     out << "Use gist_1M, neighborsize = " << nb << " , ef_construction = " << ef << "." << std::endl;
 
     out << "testnum = " << testnum << ", K =" << K << "." << std::endl;
     
-    out << "Recall@K = " << recall << ". Time: " << usedtime << "s. Time per test is " << 1.0 * (stop - start) / testnum << "s." << std::endl; 
+    out << "Recall@K = " << recall << ". Time: " << usedtime << "s. Time per test is " << usedtime / testnum << "s." << std::endl; 
 
     std::cout << "End of testing the TOGG-FINGER search by using gist" << std::endl;
     //delete alg;
@@ -649,7 +658,8 @@ void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
 
 void test_TOGG_FINGER_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     std::fstream out("./logs/TOGG_FINGER.log",std::ofstream::app);
-    time_t start,stop,usedtime = 0;
+    //time_t start,stop,usedtime = 0;
+    double usedtime = 0;
 
     std::cout << "Start testing the TOGG-FINGER search by using sift" << std::endl;
     test_load_data_sift();
@@ -661,6 +671,7 @@ void test_TOGG_FINGER_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     std::cout << alg << std::endl;
 
     Get_Graph(G,alg);
+    
     std::cout << alg << std::endl;
     delete alg;
     std::cout << "End of getting the HNSW Graph" << std::endl;
@@ -676,29 +687,32 @@ void test_TOGG_FINGER_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     //ask for recall
     //recall@K
     int correct = 0;
-        for(int i = 0;i < testnum;i ++){
+    for(int i = 0;i < testnum;i ++){
 
         std::cout << "*" << i << std::endl;
-        
+        //if(i == 3)  continue;
+
         std::set<int> ans;
 
         std::vector <Node*> testresult;
 
-        start = time(NULL);
+//        start = time(NULL);
         
         Node *tmp(new Node);
         tmp -> vec = Query[i];
 
+        TimeStart();
         testresult = OGS_KDT_Routing_test1(G,G.Nodes[0].get(),tmp,K);
-        
-        std::cout << "begin to OGS_test" << std::endl;
         testresult = OGA_routing_test1(G,testresult,tmp,K,res);
-        std::cout << "end of OGS_test" << std::endl;
+        double timestamp = TimeEnd();
+        std::cout << "Used " << timestamp << " seconds." << std::endl;
 
-        stop = time(NULL);
-        usedtime += stop - start;
+//        stop = time(NULL);
+        usedtime += timestamp;
 
         std::cout << "testresult:" << std::endl;
+        
+        
         for(auto tt:testresult){
             ans.insert(tt -> index);
             std::cout << tt -> index << " ";
@@ -723,21 +737,22 @@ void test_TOGG_FINGER_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     //    std::cout << i <<" " <<  dis(G.Nodes[i] -> vec,G.Nodes[i] -> vec) << std::endl;
         delete tmp;
     }
+   // testnum --;
 
     float recall = 1.0 * correct / testnum / K;
     std::cout << "Recall@" << K << " is " << recall << "." << std::endl;
     std::cout << "Handling " << testnum << " queries needs " << usedtime << " seconds " << std::endl;
 
     out << "" << std::endl;
-    out << "Nowtime is " << stop << "." << std::endl;
-    out << "Use sift_10000, neighborsize = " << nb << " , ef_construction = " << ef << "." << std::endl;
+    //out << "Nowtime is " << stop << "." << std::endl;
+    out << "Use gist_1M, neighborsize = " << nb << " , ef_construction = " << ef << "." << std::endl;
 
     out << "testnum = " << testnum << ", K =" << K << "." << std::endl;
     
-    out << "Recall@K = " << recall << ". Time: " << usedtime << "s. Time per test is " << 1.0 * (stop - start) / testnum << "s." << std::endl; 
+    out << "Recall@K = " << recall << ". Time: " << usedtime << "s. Time per test is " << usedtime / testnum << "s." << std::endl; 
 
     std::cout << "End of testing the TOGG-FINGER search by using sift" << std::endl;
-
+    //delete alg;
     out.close();
 
 }
@@ -753,7 +768,7 @@ int main(){
 //    test_Greedy_Search(10,10,200,16);
 //    test_TOGG_gist(10,10,200,16);
 //    test_TOGG_sift(10,10,200,16);
-    test_TOGG_FINGER_gist(10,10,200,20);
+    test_TOGG_FINGER_gist(10,10,200,128);
 //    test_TOGG_FINGER_sift(10,10,200,32);
     return 0;
 }

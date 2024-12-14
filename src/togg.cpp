@@ -381,13 +381,14 @@ std::vector<Node *> OGS_KDT_Routing_test1(Graph &G,Node *p,Node *q,int l){
     auto cmp = [&q](const Node *a,const Node *b) -> bool{
         return dis(a->vec,q->vec) < dis(b->vec,q->vec);
     };//the increasing order
+    auto cmp2 = [](const Node *a,const Node *b) -> bool{
+        return a -> index < b -> index;
+    };//the increasing index
 
-    std::set<const Node*, decltype(cmp)> C(cmp),Visited(cmp);//candidate set
+    std::set<const Node*, decltype(cmp)> C(cmp);
+    std::set<const Node*, decltype(cmp2)> Visited(cmp2);//candidate set
     C.insert(p);
     //std::unordered_set <Node*> Visited;//visited set
-
-
-
 
     //
     auto it = C.begin();
@@ -399,7 +400,7 @@ std::vector<Node *> OGS_KDT_Routing_test1(Graph &G,Node *p,Node *q,int l){
             continue;
         }
         Visited.insert(tt);
-//        std::cout << tt->index << std::endl;
+        std::cout << tt->index << std::endl;
 //        if()
 
         int ddim = get_div_dim(G,(Node *)tt,r_proportion);
@@ -462,7 +463,7 @@ std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,in
     };//the increasing order
 
     nowtesting ++;
-    out << "* " << nowtesting << std::endl;
+    //out << "* " << nowtesting << std::endl;
 
     finger_precalculate_2(G,res,q);
     std::cout << "Finger_Precalculate is over" << std::endl;
@@ -497,8 +498,8 @@ std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,in
     
         tt -> nowdistoq = dis(tt->vec,q->vec);
 
-        out << "Nownode is " << tt -> index << " " << tt -> nowdistoq << std::endl;
-        std::cout << "Nownode is " << tt -> index << " " << tt -> nowdistoq << std::endl;
+       // out << "Nownode is " << tt -> index << " " << tt -> nowdistoq << std::endl;
+        //std::cout << "Nownode is " << tt -> index << " " << tt -> nowdistoq << std::endl;
 
         //std::cout << "*" << tt  << std::endl;
         for(int i = 0;i < tt -> tonode.size();i ++){
@@ -520,8 +521,8 @@ std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,in
                 __type hdis = ndis;
 
                 while(true){
-    //                std::cout << 2 << std::endl;
-    //                std::cout << "*" << h << std::endl;
+                    //std::cout << 2 << std::endl;
+                    //std::cout << "*" << h << std::endl;
                     int x = 0;
                     for(int j = 0;j < h -> tonode.size();j ++){
                         auto hn = h -> tonode[j];
@@ -536,7 +537,7 @@ std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,in
 //                    std::cout << 3 << std::endl;
 //                    std::cout << x << " " << h -> tonode.size() << std::endl;
 //                    std::cout << "*" << h -> tonode[x] << std::endl;
-                    if(finger_dis (h -> Pqres,h -> Pdres[x]) < hdis){
+                    if(finger_dis (h -> Pqres,h -> Pdres[x]) + eps < hdis - eps){
                         hdis = finger_dis (h -> Pqres,h -> Pdres[x]);
                         h = h -> tonode[x].get();
                     }
