@@ -221,7 +221,7 @@ double cosineSimilarity(const VectorXf& a, const VectorXf& b) {
 
 //FINGER Algorithm-2
 // 方法实现
-std::tuple<MatrixXf, __type, __type, __type, __type,__type> computeParameters(std::vector <std::shared_ptr <Node> > v, int r) {
+std::tuple<MatrixXf, __type, __type, __type, __type,__type> computeParameters(std::vector <std::shared_ptr <Node> > v, int finger_r) {
     std::vector<VectorXf> D_res;
     std::vector<std::pair<VectorXf, VectorXf>> S;
 
@@ -257,7 +257,7 @@ std::tuple<MatrixXf, __type, __type, __type, __type,__type> computeParameters(st
     MatrixXf U = svd.matrixU();//U是一个边长为dim的矩阵
     MatrixXf V = svd.matrixV();
 
-    MatrixXf P = U.leftCols(r).transpose();
+    MatrixXf P = U.leftCols(finger_r).transpose();
 
     //std::cout << "Step 4" << std::endl;
     // Step 4: 计算 X 和 Y

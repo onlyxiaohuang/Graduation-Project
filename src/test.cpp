@@ -438,7 +438,7 @@ void test_TOGG_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     out << "Recall@K = " << recall << ". Time: " << usedtime << "s. Time per test is " << 1.0 * (stop - start) / testnum << "s." << std::endl; 
 
     std::cout << "End of testing the TOGG search by using gist" << std::endl;
-    delete alg;
+    //delete alg;
     out.close();
 
 }
@@ -552,7 +552,7 @@ extern std::tuple<Eigen::MatrixXf, __type, __type, __type, __type,__type> comput
 extern void finger_precalculate_1(Graph &G,std::tuple<Eigen::MatrixXf,__type,__type,__type,__type,__type> res);
 
 //testcase and r
-const int test_case = 1000,r = 10;
+const int test_case = 1000;
 
 
 void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
@@ -561,6 +561,7 @@ void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     double usedtime = 0;
 
     std::cout << "Start testing the TOGG-FINGER search by using gist" << std::endl;
+    std::cout << "Now finger_r = " << finger_r << "." << std::endl;
     test_load_data_gist();
     load_query_and_groundtruth("./test/gist/gist_query.fvecs","./test/gist/gist_groundtruth.ivecs",gist_query,gist_K,gist_dim);
     
@@ -579,7 +580,7 @@ void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     for(int i = 0 ;i < test_case ;i ++){
         Nodes.push_back(G.Nodes[i]);
     }
-    const std::tuple<Eigen::MatrixXf,__type,__type,__type,__type,__type> res = computeParameters(Nodes,r);
+    const std::tuple<Eigen::MatrixXf,__type,__type,__type,__type,__type> res = computeParameters(Nodes,finger_r);
     finger_precalculate_1(G,res);
 
     //ask for recall
@@ -647,6 +648,7 @@ void test_TOGG_FINGER_gist(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     out << "Use gist_1M, neighborsize = " << nb << " , ef_construction = " << ef << "." << std::endl;
 
     out << "testnum = " << testnum << ", K =" << K << "." << std::endl;
+    out << "finger_r is " << finger_r << "." << std::endl;
     
     out << "Recall@K = " << recall << ". Time: " << usedtime << "s. Time per test is " << usedtime / testnum << "s." << std::endl; 
 
@@ -681,7 +683,7 @@ void test_TOGG_FINGER_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
     for(int i = 0 ;i < test_case ;i ++){
         Nodes.push_back(G.Nodes[i]);
     }
-    const std::tuple<Eigen::MatrixXf,__type,__type,__type,__type,__type> res = computeParameters(Nodes,r);
+    const std::tuple<Eigen::MatrixXf,__type,__type,__type,__type,__type> res = computeParameters(Nodes,finger_r);
     finger_precalculate_1(G,res);
 
     //ask for recall
@@ -766,9 +768,9 @@ int main(){
 //    test_Get_Graph();
 //    test_OGS_KDT_Routing();
 //    test_Greedy_Search(10,10,200,16);
-//    test_TOGG_gist(10,10,200,16);
+//    test_TOGG_gist(10,10,200,128);
 //    test_TOGG_sift(10,10,200,16);
-    test_TOGG_FINGER_gist(10,10,200,128);
+    test_TOGG_FINGER_gist(10,10,1000,16);
 //    test_TOGG_FINGER_sift(10,10,200,32);
     return 0;
 }
