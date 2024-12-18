@@ -132,6 +132,7 @@ std::vector<Node *> OGS_KDT_Routing(Graph &G,Node *p,Node *q,int l){
 
 //TOGG algorithm 5
 std::vector<Node *> OGA_routing(Graph &G,std::vector <Node *> C,Node *q,int l){
+    std::fstream out("./logs/Test.log");
     auto cmp = [&q](const Node *a,const Node *b) -> bool{
         return dis(a->vec,q->vec) < dis(b->vec,q->vec);
     };//the increasing order
@@ -139,9 +140,10 @@ std::vector<Node *> OGA_routing(Graph &G,std::vector <Node *> C,Node *q,int l){
     std::set<const Node*, decltype(cmp)> Visited(cmp);
 
     __type range = dis((*C.rbegin())->vec,q->vec);
-
+    out << "Start testing TOGG." << std::endl;
     int i = 0;
     while(i < l){
+
         for(i = 0;i < l;i ++){
             if(Visited.find(C[i]) == Visited.end()){
                 break;
@@ -151,6 +153,7 @@ std::vector<Node *> OGA_routing(Graph &G,std::vector <Node *> C,Node *q,int l){
         Visited.insert(C[i]);
         
         auto tt = C[i];
+        out << tt ->index << " " << dis(tt -> vec,q -> vec) << std::endl;
         for(auto n: tt->tonode){
             if(Visited.find(n.get()) != Visited.end()){
                 if( dis(n->vec, q->vec) <= range ){
@@ -457,7 +460,7 @@ static int nowtesting = 0;
 std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,int l,std::tuple<MatrixXf,__type,__type,__type,__type,__type> res){
     std::fstream out("./logs/Test.log",std::ofstream::app);
 
-
+    out << "Start testing TOGG-FINGER." << std::endl;
     auto cmp = [&q](const Node *a,const Node *b) -> bool{
         return a->index < b->index;
     };//the increasing order
@@ -498,14 +501,14 @@ std::vector<Node *> OGA_routing_test1(Graph &G,std::vector <Node *> C,Node *q,in
     
         tt -> nowdistoq = dis(tt->vec,q->vec);
 
-       // out << "Nownode is " << tt -> index << " " << tt -> nowdistoq << std::endl;
+        out << "Nownode is " << tt -> index << " " << tt -> nowdistoq << std::endl;
         //std::cout << "Nownode is " << tt -> index << " " << tt -> nowdistoq << std::endl;
 
         //std::cout << "*" << tt  << std::endl;
         for(int i = 0;i < tt -> tonode.size();i ++){
             auto n = tt -> tonode[i];
- //          std::cout << 1 << std::endl;
- //          std::cout <<"*" << tt  << std::endl;
+   //         std::cout << 1 << std::endl;
+   //         std::cout <<"*" << tt  << std::endl;
             __type ndis = finger_dis(tt -> Pqres,tt -> Pdres[i]);
 //            std::cout << "*" << n.get() << std::endl;
 

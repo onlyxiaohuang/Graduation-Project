@@ -43,7 +43,7 @@ const int sift_dim = 128, sift_base = 10000, sift_query = 100, sift_learn = 2500
 const int gist_dim = 960, gist_base = 1000000, gist_query = 1000, gist_learn = 500000, gist_K = 100;
 
 //finger
-const int finger_r = 20;
+const int finger_r = 40;
 
 struct Node
 {
