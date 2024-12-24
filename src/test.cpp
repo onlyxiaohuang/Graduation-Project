@@ -852,9 +852,9 @@ int main(){
 //    test_Get_Graph();
 //    test_OGS_KDT_Routing();
 //    test_Greedy_Search(10,10,200,16);
-    test_TOGG_gist(10,20,1000,16);
+    test_TOGG_gist(50,20,10000,32);
 //    test_TOGG_sift(10,10,200,16);
-//    test_TOGG_FINGER_gist(10,10,1000,32);
+//    test_TOGG_FINGER_gist(10,20,10000,32);
 //    test_TOGG_FINGER_sift(10,10,200,32);
     return 0;
-}
+} 

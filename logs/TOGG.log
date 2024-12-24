@@ -70,3 +70,28 @@ Nowtime is 1734279616.
 Use gist_1M, neighborsize = 64 , ef_construction = 200.
 testnum = 10, K =10.
 Recall@K = 0.93. Time: 4522s. Time per test is 52.3s.
+
+Nowtime is 1734532885.
+Use gist_1M, neighborsize = 16 , ef_construction = 1000.
+testnum = 10, K =20.
+Recall@K = 0.89. Time: 11688s. Time per test is 1168.8s.
+
+Nowtime is 1734600700.
+Use gist_1M, neighborsize = 16 , ef_construction = 1000.
+testnum = 10, K =10.
+Recall@K = 0.87. Time: 5913s. Time per test is 591.3s.
+
+Nowtime is 1734641455.
+Use gist_1M, neighborsize = 16 , ef_construction = 2000.
+testnum = 10, K =20.
+Recall@K = 0.885. Time: 11339s. Time per test is 1133.9s.
+
+Nowtime is 1734804834.
+Use gist_1M, neighborsize = 32 , ef_construction = 2000.
+testnum = 10, K =20.
+Recall@K = 0.97. Time: 8212s. Time per test is 821.2s.
+
+Nowtime is 1734963555.
+Use gist_1M, neighborsize = 32 , ef_construction = 2000.
+testnum = 50, K =20.
+Recall@K = 0.895. Time: 42575s. Time per test is 851.5s.

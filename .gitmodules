@@ -4,3 +4,12 @@
 [submodule "src/libs/eigen"]
 	path = src/libs/eigen
 	url = https://github.com/PX4/eigen.git
+[submodule "src/libs/nsg"]
+	path = src/libs/nsg
+	url = https://github.com/ZJULearning/nsg.git
+[submodule "src/libs/efanna_graph"]
+	path = src/libs/efanna_graph
+	url = https://github.com/ZJULearning/efanna_graph.git
+[submodule "src/libs/nmslib"]
+	path = src/libs/nmslib
+	url = https://github.com/nmslib/nmslib.git
