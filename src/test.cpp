@@ -844,6 +844,17 @@ void test_TOGG_FINGER_sift(int testnum = 10,int K = 10,int ef = 200,int nb = 8){
 }
 
 
+void test_NSG_gist(int testnum = 10,int K = 10,int ef = 2000,int nb = 32){
+    std::fstream out("./logs/NSG.log",std::ofstream::app);
+    double usedtime = 0;
+
+    test_load_data_gist();
+    load_query_and_groundtruth("./test/gist/gist_query.fvecs","./test/gist/gist_groundtruth.ivecs",gist_query,gist_K,gist_dim);
+
+
+
+}
+
 int main(){
     
 //    test_rand();
@@ -852,9 +863,9 @@ int main(){
 //    test_Get_Graph();
 //    test_OGS_KDT_Routing();
 //    test_Greedy_Search(10,10,200,16);
-    test_TOGG_gist(50,20,10000,32);
+//    test_TOGG_gist(50,20,10000,16);
 //    test_TOGG_sift(10,10,200,16);
-//    test_TOGG_FINGER_gist(10,20,10000,32);
+    test_TOGG_FINGER_gist(50,20,10000,32);
 //    test_TOGG_FINGER_sift(10,10,200,32);
     return 0;
 } 

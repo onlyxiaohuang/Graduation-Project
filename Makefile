@@ -56,3 +56,5 @@ clean:
 	rm -rf ./output/main.o
 	rm -rf ./output/main
 	rm -rf ./output/togg.o
+
+
