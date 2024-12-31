@@ -91,6 +91,7 @@ void Get_Graph(Graph &G,hnswlib::HierarchicalNSW<__type>* alg){
             }
             G.Nodes[i]->tonode.swap(tonode);
         }
+        G.Nodes[i] -> index = i;
     }
 
 }

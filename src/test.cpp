@@ -1,5 +1,6 @@
 #include "utils.hpp"
 #include "hnsw.hpp"
+#include "nsg.hpp"
 
 #include <iostream>
 
@@ -848,10 +849,103 @@ void test_NSG_gist(int testnum = 10,int K = 10,int ef = 2000,int nb = 32){
     std::fstream out("./logs/NSG.log",std::ofstream::app);
     double usedtime = 0;
 
+/*  //gist数据集
     test_load_data_gist();
     load_query_and_groundtruth("./test/gist/gist_query.fvecs","./test/gist/gist_groundtruth.ivecs",gist_query,gist_K,gist_dim);
 
+    std::cout << "Start getting the HNSW&NSG Graph" << std::endl;
+    alg = build_graph_HNSW(G,gist_base,gist_dim,ef,nb);
+//    std::cout << alg << std::endl;
+*/
+    //sift数据集
+    test_load_data_sift();
+    load_query_and_groundtruth("./test/sift/sift_query.fvecs","./test/sift/sift_groundtruth.ivecs",sift_query,sift_K,sift_dim);
 
+    std::cout << "Start getting the HNSW&NSG Graph" << std::endl;
+    alg = build_graph_HNSW(G,sift_base,sift_dim,ef,nb);
+
+    //使用hnsw建图
+    Get_Graph(G,alg);
+    Build_NSG_Graph(G,alg);
+    delete alg;
+
+    std::cout << "End of getting NSG Graph" << std::endl;
+    
+    std::vector<std::shared_ptr<Node> > Nodes;
+    for(int i = 0 ;i < test_case ;i ++){
+        Nodes.push_back(G.Nodes[i]);
+    }
+    const std::tuple<Eigen::MatrixXf,__type,__type,__type,__type,__type> res = computeParameters(Nodes,finger_r);
+    finger_precalculate_1(G,res);
+
+    int correct = 0;
+    for(int i = 0;i < testnum;i ++){
+
+        std::cout << "*" << i << std::endl;
+        //if(i == 3)  continue;
+
+        std::set<int> ans;
+
+        std::vector <Node*> testresult;
+
+//        start = time(NULL);
+        
+        Node *tmp(new Node);
+        tmp -> vec = Query[i];
+
+        TimeStart();
+        testresult = OGS_KDT_Routing_test1(G,G.Nodes[0].get(),tmp,K);
+        testresult = OGA_routing_test1(G,testresult,tmp,K,res);
+        double timestamp = TimeEnd();
+        std::cout << "Used " << timestamp << " seconds." << std::endl;
+
+//        stop = time(NULL);
+        usedtime += timestamp;
+
+        std::cout << "testresult:" << std::endl;
+        
+        
+        for(auto tt:testresult){
+            ans.insert(tt -> index);
+            std::cout << tt -> index << " ";
+            std::cout << "dis:" << dis(tt -> vec,tmp -> vec) << " ";
+        }
+        std::cout << std::endl;
+
+        std::cout << "Ansresult:" << std::endl;
+        int dd = K;
+        for(int j = 0; j < K; j ++){
+//            auto now = result.top(); result.pop();
+            auto now = Groundtruth[i][j];
+            std::cout << now << " ";
+            std::cout << "dis:" << dis(G.Nodes[now] -> vec,tmp -> vec) << " ";
+            if(ans.find(now) != ans.end()){
+                correct ++;
+            }
+        }
+        std::cout << std::endl;
+
+    //    std::cout << "Now Node:" << std::endl;
+    //    std::cout << i <<" " <<  dis(G.Nodes[i] -> vec,G.Nodes[i] -> vec) << std::endl;
+        delete tmp;
+    }
+   // testnum --;
+
+    float recall = 1.0 * correct / testnum / K;
+    std::cout << "Recall@" << K << " is " << recall << "." << std::endl;
+    std::cout << "Handling " << testnum << " queries needs " << usedtime << " seconds " << std::endl;
+
+    out << "" << std::endl;
+    //out << "Nowtime is " << stop << "." << std::endl;
+    out << "Use gist_1M, neighborsize = " << nb << " , ef_construction = " << ef << "." << std::endl;
+
+    out << "testnum = " << testnum << ", K =" << K << "." << std::endl;
+    
+    out << "Recall@K = " << recall << ". Time: " << usedtime << "s. Time per test is " << usedtime / testnum << "s." << std::endl; 
+
+    std::cout << "End of testing the NSW TOGG-FINGER search by using sift" << std::endl;
+    //delete alg;
+    out.close();
 
 }
 
@@ -863,9 +957,10 @@ int main(){
 //    test_Get_Graph();
 //    test_OGS_KDT_Routing();
 //    test_Greedy_Search(10,10,200,16);
-//    test_TOGG_gist(50,20,10000,16);
+//    test_TOGG_gist(50,50,5000,16);
 //    test_TOGG_sift(10,10,200,16);
-    test_TOGG_FINGER_gist(50,20,10000,32);
+//    test_TOGG_FINGER_gist(50,50,5000,16);
 //    test_TOGG_FINGER_sift(10,10,200,32);
+    test_NSG_gist(10,10,2000,32);
     return 0;
 } 

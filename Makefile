@@ -22,6 +22,9 @@ hnsw:
 #MAKE TOGG
 togg:
 	$(G++) $(CFLAGS) -c ./src/togg.cpp -o ./output/togg.o
+#MAKE NSG
+nsg:
+	$(G++) $(CFLAGS) -c ./src/nsg.cpp -o ./output/nsg.o
 
 #MAKE MAIN
 main: main.o 
@@ -38,10 +41,10 @@ debugmain.o: ./src/main.cpp utils hnsw togg
 
 #MAKE TEST
 test: test.o 
-	$(G++) ./output/test.o ./output/utils.o ./output/hnsw.o ./output/togg.o -o ./output/test
+	$(G++) ./output/test.o ./output/utils.o ./output/hnsw.o ./output/togg.o ./output/nsg.o -o ./output/test
 	./output/test
 
-test.o: ./src/test.cpp utils hnsw togg
+test.o: ./src/test.cpp utils hnsw togg nsg
 	$(G++) $(CFLAGS) -c $(CDEBUG) ./src/test.cpp -o ./output/test.o	
 
 

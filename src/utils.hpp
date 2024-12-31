@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <memory>
 #include <chrono>
+#include <bitset>
+#include <functional>
 
 //eigen
 #include "./libs/eigen/Eigen/SVD"

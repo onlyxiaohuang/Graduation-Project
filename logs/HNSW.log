@@ -30,3 +30,7 @@ Recall@K = 0. Time: 0.002627s. Time per test is 5.254e-05s.
 Use gist_1M, neighborsize = 32 , ef_construction = 10000.
 testnum = 50, K =20.
 Recall@K = 0. Time: 0.002644s. Time per test is 5.288e-05s.
+
+Use gist_1M, neighborsize = 16 , ef_construction = 5000.
+testnum = 50, K =50.
+Recall@K = 0. Time: 0.004089s. Time per test is 8.178e-05s.
